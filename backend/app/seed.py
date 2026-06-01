@@ -27,9 +27,12 @@ def run():
     db = SessionLocal()
     try:
         # ── Admin users ──────────────────────────────────────────────────────
+        admin2_accounts = []
+        if settings.ADMIN2_EMAIL and settings.ADMIN2_PASSWORD:
+            admin2_accounts.append((settings.ADMIN2_EMAIL, settings.ADMIN2_PASSWORD, "El Malecón Admin"))
         for email, password, full_name in [
             (settings.ADMIN_EMAIL, settings.ADMIN_PASSWORD, "Administrador"),
-            ("info@elmalecondelasalsa.com", "g45grTg6h456tTrgFG", "El Malecón Admin"),
+            *admin2_accounts,
         ]:
             u = db.query(models.User).filter_by(email=email).first()
             if not u:

@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@elmaleconcastelldefels.com"
     ADMIN_PASSWORD: str = "malecon2026"
 
+    # Segundo admin operativo
+    ADMIN2_EMAIL: str = "info@elmalecondelasalsa.com"
+    ADMIN2_PASSWORD: str = ""
+
     # Database
     POSTGRES_USER: str = "malecon"
     POSTGRES_PASSWORD: str = "malecon"

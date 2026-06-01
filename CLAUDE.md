@@ -1,117 +1,158 @@
-# El Malecón de Castelldefels — Contexto del proyecto
+# elMalecón Castelldefels — Contexto del proyecto
 
 ## Qué es este proyecto
 
 Web completa para una **escuela de baile latino** en Castelldefels (Barcelona).
-Dominio: `elmaleconcastelldefels.com`. Estética: verde neón (#2FE56B) sobre fondos oscuros (#0A0E0B), energía de club latino.
+Dominio: `elmaleconcastelldefels.com`. Estética: verde neón (#2FE56B) sobre fondos oscuros (#0A0E0B).
+URL real de la escuela: Carrer de Tomàs Edison, 20, 08860 Castelldefels. Tel: 672 89 52 39.
 
 ## Stack
 
 | Servicio     | Tecnología                              | Puerto local |
-|------------- |-----------------------------------------|-------------|
-| `api`        | Python 3.12 · FastAPI · SQLAlchemy ORM  | 8000        |
-| `db`         | PostgreSQL 16 (volumen `data/db/`)      | 5432        |
-| `worker`     | Python · caché de redes sociales        | —           |
-| `frontend`   | React 18 + Vite · i18n (ES/CA/EN)       | 5173 / 8080 |
-| Proxy (prod) | nginx + acme-companion (SSL automático) | 80/443      |
+|------------- |-----------------------------------------|--------------|
+| `api`        | Python 3.12 · FastAPI · SQLAlchemy ORM  | 8000         |
+| `db`         | PostgreSQL 16 (volumen `data/db/`)      | 5432         |
+| `worker`     | Python · caché de redes sociales        | —            |
+| `frontend`   | React 18 + Vite · i18n (ES/CA/EN)       | 5173 / 8080  |
+| Proxy (prod) | nginx + acme-companion (SSL automático) | 80/443       |
 
-## Estructura clave
-
-```
-backend/app/
-  core/         → config.py (Settings), database.py, deps.py, security.py (JWT)
-  models/       → SQLAlchemy ORM: Course, Event, Student, Teacher, Lead, User…
-  routers/      → FastAPI routers por dominio (auth, courses, events, students…)
-  schemas/      → Pydantic v2: catalog.py, crm.py, social.py, auth.py
-  services/     → email.py (SMTP), image_ai.py (generación de imágenes con IA)
-  seed.py       → Crea tablas + datos semilla al arrancar (5 cursos, 5 profesores…)
-  generate_images.py → Genera imágenes para todos los cursos/eventos
-
-frontend/src/
-  pages/        → Home, Courses, Events, School, Schedule, Contact, Legal
-  pages/admin/  → Dashboard, CoursesAdmin, EventsAdmin, StudentsAdmin, TeachersAdmin…
-  components/   → Header, Footer, CourseCard, Carousel, WhatsAppButton, SocialFeed…
-  i18n/         → es.json, ca.json, en.json  (strings multiidioma)
-  styles/       → theme.css, layout.css, el-malecon-styles.css, admin.css
-  media/        → Assets multimedia estáticos (videos para el hero, etc.)
-  api/client.js → Funciones fetch hacia /api/*
-
-worker/worker.py → Refresca caché de publicaciones sociales cada SOCIAL_REFRESH_SECONDS
-```
-
-## Desarrollo rápido
+## Arranque rápido
 
 ```bash
-# Arrancar todo con Docker (recomendado)
+# Todo con Docker (recomendado)
 docker compose -f docker-compose.yml -f dev.yml up --build
 
-# Solo frontend con hot reload
+# Solo frontend (hot reload)
 cd frontend && npm install && npm run dev   # proxy /api y /media → :8000
 
 # Solo backend
 cd backend && pip install -r requirements.txt
-uvicorn app.main:app --reload              # crea tablas + seed al arrancar
+uvicorn app.main:app --reload
 ```
 
-## Variables de entorno clave (`.env`)
+## Estructura clave
 
-| Variable               | Uso                                             |
-|------------------------|-------------------------------------------------|
-| `JWT_SECRET`           | Firmar tokens JWT — cambiar en producción       |
-| `ADMIN_EMAIL/PASSWORD` | Credenciales del primer admin (creadas por seed)|
-| `POSTGRES_*`           | Conexión a la base de datos                     |
-| `SMTP_*`               | Envío de email (Gmail con App Password)         |
-| `WHATSAPP_NUMBER`      | Número de WhatsApp para botón flotante          |
-| `IMAGE_AI_PROVIDER`    | `claude` \| `openai` \| `stability` \| vacío    |
-| `IMAGE_AI_KEY`         | Clave del proveedor de imágenes (o ANTHROPIC_API_KEY)|
-| `ANTHROPIC_API_KEY`    | API key de Anthropic (para proveedor `claude`)  |
-| `IG_TOKEN/YOUTUBE_*`   | Tokens de redes sociales (vacío = placeholders) |
+```text
+backend/app/
+  core/         → config.py (Settings + ANTHROPIC_API_KEY), database.py, deps.py, security.py
+  models/       → Course, Teacher (many-to-many course_teachers), Student, Enrollment,
+                  ClassSession, Event, EventPhoto, Lead, User, SiteSetting, SocialPost,
+                  ConsentLog, MediaFile (nuevo: metadatos SEO de media)
+  routers/      → students (con enrollments anidados y consistencia de estado)
+                  teachers (con asignación de cursos y protección de desactivación)
+                  courses (con endpoints /students para gestión de inscritos)
+                  events (status calculado automáticamente por fecha)
+                  media (list, upload, delete, metadata)
+                  themes (selector CSS + export/import variables JSON)
+                  public, auth, leads, enrollments, stats, images
+  schemas/      → crm.py (StudentOut incluye EnrollmentBrief[])
+                  catalog.py (EventOut incluye computed_status)
+  services/     → email.py, image_ai.py (claude|openai|stability|placeholder)
+  seed.py       → Datos REALES: 10 profesores, 6 cursos, 9 eventos, 2 admins
 
-## Generación de imágenes con IA
-
-El módulo `backend/app/services/image_ai.py` es pluggable:
-- **`claude`** → Genera SVG de alta calidad usando Claude API (recomendado)
-- **`openai`** → Genera PNG/JPEG usando gpt-image-1 o DALL-E
-- **`stability`** → Genera PNG con Stable Diffusion
-- **vacío** → Placeholder SVG offline con la estética de marca (funciona siempre)
-
-Actívalo en `.env`:
+frontend/src/
+  pages/        → Home, Courses, Events, School, Schedule, Contact, Legal
+  pages/admin/  → Dashboard, StudentsAdmin (panel inscripciones), CoursesAdmin (gestión profes/alumnos),
+                  TeachersAdmin (asignación cursos), EventsAdmin (status auto), LeadsAdmin,
+                  Appearance (editor vars CSS + export/import), MediaAdmin (explorador)
+  components/   → Header (logo solo), Footer (2 cols, iconos SVG redes), LanguageSelector (banderas)
+                  CourseCard, Carousel, WhatsAppButton, SocialFeed, Modal, CookieBanner
+  i18n/         → es.json, ca.json, en.json
+  media/        → bailandoSalsa.optimize.mp4 (vídeo hero)
+  api/client.js → fetch wrappers hacia /api/*
 ```
-IMAGE_AI_PROVIDER=claude
-ANTHROPIC_API_KEY=sk-ant-...
-IMAGE_AI_MODEL=claude-haiku-4-5-20251001   # opcional
+
+## Variables de entorno clave
+
+| Variable               | Uso                                                |
+|------------------------|----------------------------------------------------|
+| `JWT_SECRET`           | Firmar tokens JWT — cambiar en producción          |
+| `ADMIN_EMAIL/PASSWORD` | Primer admin (seed)                                |
+| `POSTGRES_*`           | Conexión PostgreSQL                                |
+| `SMTP_*`               | Email (Gmail con App Password o Brevo/SES)         |
+| `WHATSAPP_NUMBER`      | +34672895239 (botón flotante + formulario contacto)|
+| `IMAGE_AI_PROVIDER`    | `claude` \| `openai` \| `stability` \| vacío       |
+| `ANTHROPIC_API_KEY`    | Para proveedor `claude` (genera SVG artístico)     |
+| `IMAGE_AI_KEY`         | Para openai o stability                            |
+| `IG_TOKEN/YOUTUBE_*`   | Tokens redes sociales (vacío = placeholders)       |
+
+## Administración
+
+**URL privada:** `/gurutiadmin` (NO `/admin`)
+
+**Credenciales seed:**
+
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` (de .env)
+- `info@elmalecondelasalsa.com` / `g45grTg6h456tTrgFG`
+
+## Datos reales cargados en seed (junio 2026)
+
+**Profesores (10):** Aroa, Frederic, Jorge, Juanjo, Mónica, Sergi, Telma, Marta, Yasmany, Mario Layunta
+
+**Cursos (6):**
+
+| Curso                        | Día       | Horario     | Sala   |
+|------------------------------|-----------|-------------|--------|
+| Salsa Inicio                 | Jueves    | 19:00–21:00 | Sala 1 |
+| Bachata Inicio               | Lunes     | 18:00–20:00 | Sala 2 |
+| Estilo Chica de Bachata      | Miércoles | 18:00–19:00 | Sala 2 |
+| Merengue Inicio              | Martes    | 18:30–19:30 | Sala 1 |
+| Salsa con Rumba y Son Cubano | Miércoles | 20:00–22:00 | Sala 1 |
+| Cha-Cha Boogaloo             | Viernes   | 18:00–19:00 | Sala 1 |
+
+**Eventos (9):** Mayo–Junio 2026, desde Primer Tardeo hasta Fiesta Blanca.
+
+## Media en runtime (NO en git)
+
+Las imágenes se sirven desde `data/media/` montado como volumen Docker.
+Las imágenes **no están en git** (excluidas por `.gitignore`).
+Al desplegar en un servidor nuevo:
+
+```bash
+# Las imágenes de cursos, profesores y eventos ya están procesadas en data/media/
+# Solo asegúrate de que el volumen Docker apunta a ese directorio
+docker compose up -d
 ```
 
-## Flujo del admin
+Rutas:
 
-1. Login en `/admin` → JWT guardado en localStorage
-2. **Dashboard** → estadísticas (estudiantes, ingresos, conversiones)
-3. **CRM** → Leads, Estudiantes, Profesores con conversión Lead→Estudiante
-4. **Catálogo** → Cursos y Eventos con upload de imágenes y botón ✨ (generar con IA)
-5. **Apariencia** → Temas CSS seleccionables desde el panel
+- `data/media/profesores/{slug}/foto.jpg` — foto del profesor
+- `data/media/cursos/{slug}/imagen.jpg` — imagen del curso
+- `data/media/eventos/{slug}/principal.jpg` — flyer del evento
+- `data/media/escuela/` — logo y fotos de la escuela
 
-## Datos de seed (§5)
+## Modelo de estudiante (actualizado)
 
-Al arrancar se crean: 5 cursos (Salsa Cubana N1/N2, Son Cubano, Bachata Sensual, Reggaeton Heels), 5 profesores, 10 estudiantes con estados variados, varios leads y el evento "Guarachando Summer 2026". Todo editable desde el admin.
-
-## Estado actual del proyecto (junio 2026)
-
-- [x] Backend completo: auth, CRM, catálogo, redes, generación de imágenes
-- [x] Frontend público: Hero con video, cursos, eventos, horarios, contacto, legal
-- [x] Panel de admin funcional
-- [x] i18n ES/CA/EN
-- [x] Hero con video de fondo (`bailandoSalsa.optimize.mp4`)
-- [x] Selector de idioma con banderas desplegable
-- [ ] Logo definitivo del cliente (`frontend/public/logo.png`)
-- [ ] Tokens reales de redes sociales (IG, YouTube)
-- [ ] Configurar SMTP para envío de email
-- [ ] Certificado SSL en producción (acme-companion lo gestiona automáticamente)
-- [ ] Textos legales revisados por jurista
+**Status:** `inscrito` | `interesado` | `graduado` | `baja`
+**Canal:** `web` | `whatsapp` | `redes` | `escuela` | `contactos`
+**Campos nuevos:** `contact_date` (fecha primer contacto)
+**Consistencia:** al poner `baja`, todos los enrollments activos pasan a `baja` automáticamente.
 
 ## Convenciones
 
-- CSS: variables en `theme.css` (`--green`, `--bg`, `--surface`, `--text`, `--border`)
-- Rutas API: `/api/...` (auth en `/api/auth/...`, admin en `/api/admin/...`, público en `/api/public/...`)
-- Media en runtime: `/media/<carpeta>/<archivo>` servido por FastAPI desde `data/media/`
-- Media estática del build: `frontend/src/media/` importada por Vite → `dist/assets/`
-- Idiomas: i18next, claves tipo `nav.home`, `home.heroTitle`, `common.viewMore`
+- CSS: variables en `theme.css`. Variables personalizadas en `site_settings` (key=`CSS_VAR_*`)
+- Eventos: `computed_status` calculado por fecha en cada respuesta de la API
+- Admin URL: `/gurutiadmin/*` — nunca exponerla en la UI pública
+- Media: `GET /api/admin/media/list?folder=` → list | `POST /upload` | `DELETE /delete?path=` | `GET/PUT /metadata`
+- Templates: `GET /api/admin/themes/export` → JSON | `POST /api/admin/themes/import` | `PUT /api/admin/themes/variables`
+
+## Estado del proyecto (junio 2026)
+
+- [x] Backend completo con todos los módulos
+- [x] Frontend público multi-idioma ES/CA/EN
+- [x] Panel admin en /gurutiadmin con todas las secciones
+- [x] Datos reales: 10 profesores, 6 cursos, 9 eventos
+- [x] Imágenes reales de cursos, profesores y eventos
+- [x] Vídeo hero (bailandoSalsa.optimize.mp4)
+- [x] Selector de idioma con banderas desplegable
+- [x] Generación de imágenes con Claude API (SVG) u OpenAI/Stability (PNG)
+- [x] Media Explorer en admin
+- [x] Template export/import de variables CSS
+- [ ] Logo definitivo del cliente (`frontend/public/logo.png`)
+- [ ] Tokens reales de redes sociales (IG, YouTube, FB, TikTok)
+- [ ] Configurar SMTP (Gmail App Password o Brevo)
+- [ ] Datos biográficos completos de profesores (bio, email, especialidades)
+- [ ] Datos de inscripción y horarios definitivos de cursos
+- [ ] Certificado SSL en producción (acme-companion lo gestiona automáticamente)
+- [ ] Textos legales revisados por jurista (Legal.jsx)
+- [ ] Pasarela de pagos (estructura en BD lista, activar con PAYMENT_PROVIDER)

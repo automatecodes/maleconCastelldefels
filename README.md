@@ -1,121 +1,129 @@
-# El Malecón de la Salsa — elmaleconcastelldefels.com
+# elMalecón Castelldefels — elmaleconcastelldefels.com
 
-Web pública multi-idioma (ES/CA/EN) + backend de administración con CRM, calendario
-visual, panel de estadísticas, galerías, feed de redes y formulario de contacto con
-énfasis en WhatsApp. Construida según `PROMPT_malecon.md`.
+Web pública multi-idioma (ES/CA/EN) + panel de administración completo con CRM, calendario
+visual, media explorer, generación de imágenes con IA, y formulario de contacto integrado
+con WhatsApp y email.
 
 > **Estética:** verde neón "glow" sobre fondos oscuros, energía de club latino.
-> El **logo lo sube el cliente** (ver más abajo).
+> El **logo lo sube el cliente:** coloca `logo.png` en `frontend/public/`.
 
 ---
 
 ## 🧱 Stack
 
-| Servicio   | Tecnología                          |
-|------------|-------------------------------------|
-| `api`      | Python · FastAPI · SQLAlchemy       |
-| `db`       | PostgreSQL 16                       |
-| `worker`   | Python (caché de redes sociales)    |
-| `frontend` | React + Vite (SPA) · i18n · Recharts |
-
-Arquitectura **modular y extensible**: el modelo de datos ya reserva el camino para
-**login, autorregistro de estudiantes y pagos** (ver §11 del prompt) sin reescritura.
+| Servicio   | Tecnología                              |
+|------------|-----------------------------------------|
+| `api`      | Python 3.12 · FastAPI · SQLAlchemy ORM  |
+| `db`       | PostgreSQL 16                           |
+| `worker`   | Python (caché de redes sociales)        |
+| `frontend` | React 18 + Vite · i18n · Recharts       |
 
 ---
 
 ## 🚀 Puesta en marcha
 
 ### 1. Configurar el entorno
+
 ```bash
 cp .env.example .env
-# Edita .env: JWT_SECRET, contraseñas de DB, ADMIN_PASSWORD, SMTP y (opcional) tokens.
+# Edita .env: JWT_SECRET, POSTGRES_PASSWORD, ADMIN_PASSWORD, SMTP (opcional)
 ```
 
 ### 2. Desarrollo local (con Docker)
+
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.yml -f dev.yml up --build
 ```
-- Web:   http://localhost:8080
-- API:   http://localhost:8000/docs  (Swagger)
-- Admin: http://localhost:8080/admin
 
-La API crea las tablas y ejecuta el **seed** automáticamente al arrancar.
+- Web: `http://localhost:8080`
+- API Swagger: `http://localhost:8000/docs`
+- Admin: `http://localhost:8080/gurutiadmin`
 
-### 3. Desarrollo del frontend sin Docker (hot reload)
+### 3. Frontend sin Docker (hot reload)
+
 ```bash
 # Terminal 1 — backend
-cd backend
-python -m venv .venv && . .venv/Scripts/activate   # Windows
-pip install -r requirements.txt
-python -m app.seed          # crea tablas + datos semilla (requiere PostgreSQL local)
+cd backend && pip install -r requirements.txt
 uvicorn app.main:app --reload
 
 # Terminal 2 — frontend
-cd frontend
-npm install
-npm run dev                 # http://localhost:5173 (proxy /api y /media → :8000)
+cd frontend && npm install && npm run dev   # → http://localhost:5173
 ```
 
-### 4. Producción (detrás de nginx-proxy + acme-companion)
-La red externa `proxyNet` y el reverse proxy con SSL deben existir previamente:
+### 4. Producción
+
 ```bash
-docker network create proxyNet   # si no existe
+docker network create proxyNet   # solo la primera vez
 docker compose up --build -d
 ```
-El servicio `frontend` se publica con `VIRTUAL_HOST`/`LETSENCRYPT_HOST` =
-`elmaleconcastelldefels.com`. **No se exponen puertos al host.**
+
+El servicio `frontend` se publica automáticamente con `VIRTUAL_HOST` y `LETSENCRYPT_HOST`.
 
 ---
 
 ## 🔑 Acceso al admin
 
-Credenciales iniciales (de `.env`, cámbialas):
+**URL:** `/gurutiadmin` (privada — no se expone en la UI pública)
+
+Credenciales iniciales (de `.env`):
+
+```text
+ADMIN_EMAIL / ADMIN_PASSWORD
+info@elmalecondelasalsa.com / (ver .env)
 ```
-Email:       ADMIN_EMAIL      (def. admin@elmaleconcastelldefels.com)
-Contraseña:  ADMIN_PASSWORD   (def. malecon2026)
-```
-Incluye: panel de **estadísticas**, CRM de **estudiantes**, **profesores**, **cursos**,
-**eventos** y **bandeja de Leads** (con conversión Lead → Estudiante).
+
+El panel incluye: estadísticas, CRM de estudiantes con inscripciones multi-curso,
+profesores, cursos, eventos, leads, explorador de media y editor de apariencia.
 
 ---
 
-## 🖼️ Logo y media
+## 🌱 Datos reales cargados (seed junio 2026)
 
-1. **Logo:** coloca `logo.png` en `frontend/public/` (cabecera + favicon). Sin él, el
-   header muestra el texto «elMalecón» como respaldo. Recomendado además `logo-og.png`
-   (1200×630) para Open Graph.
-2. **Media** (imágenes, vídeos, CV en PDF) se organiza en `data/media/` siguiendo:
-   ```
-   data/media/
-     escuela/                   (hero.mp4, instalación*.jpg, institucional.mp4, logo)
-     cursos/<slug>/             (imagen.jpg, video del curso)
-     profesores/<slug>/         (foto.jpg, cv.pdf, video)
-     eventos/<slug>/            (principal.jpg + galeria/)
-   ```
-   Súbela también desde **Admin → Mediateca** (endpoint `/api/admin/media/upload`).
+**10 profesores:** Aroa, Frederic, Jorge, Juanjo, Mónica, Sergi, Telma, Marta, Yasmany, Mario Layunta
 
-> En la etapa inicial las imágenes de cursos/web pueden **generarse con IA**
-> (`IMAGE_AI_PROVIDER`/`IMAGE_AI_KEY`). Los `image_url` del seed apuntan a las rutas
-> esperadas; basta con colocar los ficheros ahí.
+**6 cursos:**
 
----
+| Curso                        | Día       | Horario     | Sala   |
+|------------------------------|-----------|-------------|--------|
+| Salsa Inicio                 | Jueves    | 19:00–21:00 | Sala 1 |
+| Bachata Inicio               | Lunes     | 18:00–20:00 | Sala 2 |
+| Estilo Chica de Bachata      | Miércoles | 18:00–19:00 | Sala 2 |
+| Merengue Inicio              | Martes    | 18:30–19:30 | Sala 1 |
+| Salsa con Rumba y Son Cubano | Miércoles | 20:00–22:00 | Sala 1 |
+| Cha-Cha Boogaloo             | Viernes   | 18:00–19:00 | Sala 1 |
 
-## 🌱 Datos semilla (§5)
-
-Al sembrar se crean: **5 cursos**, **5 profesores**, **10 estudiantes** (con estados y
-orígenes variados para poblar las estadísticas), varios **leads** y el evento
-**Guarachando Summer 2026** con galería. Todo es **editable** desde el admin.
+**9 eventos:** Mayo–Junio 2026, con flyers reales de Bailorama/Facebook.
 
 Re-sembrar manualmente:
+
 ```bash
 docker compose exec api python -m app.seed
 ```
 
 ---
 
-## 🎨 Generación de imágenes con IA (§3.3)
+## 🖼️ Media
 
-Módulo **pluggable** por `.env`. Soporta tres proveedores:
+Las imágenes se organizan en `data/media/` y se sirven en `/media/*`:
+
+```text
+data/media/
+  escuela/              (logo, fotos instalaciones, hero.mp4)
+  cursos/<slug>/        (imagen.jpg)
+  profesores/<slug>/    (foto.jpg)
+  eventos/<slug>/       (principal.jpg + galeria/)
+```
+
+Las imágenes **no están en git** (excluidas por `.gitignore`). Al desplegar en producción,
+el directorio `data/media/` ya contiene las imágenes procesadas desde los flyers originales.
+
+Gestión desde el admin: **Admin → Media** (upload, delete, alt text, SEO, link).
+
+---
+
+## 🎨 Generación de imágenes con IA
+
+Módulo pluggable vía `.env`:
 
 | Proveedor   | Variable clave      | Resultado | Notas                                            |
 |-------------|---------------------|-----------|--------------------------------------------------|
@@ -124,54 +132,44 @@ Módulo **pluggable** por `.env`. Soporta tres proveedores:
 | `stability` | `IMAGE_AI_KEY`      | PNG       | Stable Diffusion Core                            |
 | *(vacío)*   | —                   | SVG       | Placeholder de marca offline                     |
 
-### Configuración recomendada (Claude)
-
 ```env
 IMAGE_AI_PROVIDER=claude
 ANTHROPIC_API_KEY=sk-ant-...
-IMAGE_AI_MODEL=claude-haiku-4-5-20251001   # opcional, usa haiku por defecto
+IMAGE_AI_MODEL=claude-haiku-4-5-20251001   # opcional
 ```
-> Claude no genera imágenes raster (PNG/JPEG) pero produce SVG artísticos de alta
-> calidad con gradientes, sombras y la estética de marca del Malecón. Para imágenes
-> fotorrealistas usa OpenAI o Stability AI.
 
-Formas de usar:
-- **Admin** → en *Cursos* y *Eventos*, botón **✨** en cada fila (genera y asigna la imagen).
-- **API**: `POST /api/admin/images/course/{id}`, `/event/{id}` o `/generate` (prompt libre).
-- **Bulk / arranque**: el seed genera imágenes para todos los cursos y el evento. Manual:
-  ```bash
-  docker compose exec api python -m app.generate_images          # solo faltantes
-  docker compose exec api python -m app.generate_images --force  # regenerar todas
-  ```
-
-## 🔌 Conectores de redes
-
-El `worker` refresca la caché de publicaciones (Instagram/YouTube; FB/TikTok preparados)
-cada `SOCIAL_REFRESH_SECONDS`. **Sin tokens válidos** se mantienen *placeholders* y se
-reintenta en cada ciclo. Añade `IG_TOKEN`, `YOUTUBE_API_KEY`, etc. en `.env`.
+Desde el admin: botón **✨** en cada curso o evento para generar y asignar la imagen.
 
 ---
 
-## 📋 PENDIENTE al construir (§12)
-- [ ] Logo definitivo y ajustes finos de marca.
-- [ ] Tokens oficiales FB/IG/YouTube/TikTok.
-- [ ] Cuenta Gmail + contraseña de aplicación (o SMTP alternativo).
-- [ ] Proveedor de generación de imágenes IA.
-- [ ] Datos legales del titular (razón social, NIF, domicilio, email) en los textos del
-      Anexo A (`frontend/src/pages/Legal.jsx`) + revisión jurídica y traducción CA/EN.
-- [ ] Confirmar cursos, niveles y profesores definitivos.
+## 🎭 Apariencia y temas
 
-## 🔭 Fases futuras (§11) — el camino ya está hecho
+El admin incluye un editor visual de variables CSS con soporte para:
+
+- Selección de hoja de estilos activa
+- Editor de colores y tipografía con color pickers en tiempo real
+- **Exportar tema** como JSON (`/api/admin/themes/export`)
+- **Importar tema** desde JSON (reaplica todos los parámetros)
+
+---
+
+## 📋 Pendiente
+
+- [ ] Logo definitivo (`frontend/public/logo.png`)
+- [ ] Tokens reales de redes sociales (IG, YouTube, FB, TikTok)
+- [ ] Configurar SMTP (Gmail App Password o Brevo)
+- [ ] Datos completos de profesores (bio, email, especialidades)
+- [ ] Revisar textos legales con jurista (`frontend/src/pages/Legal.jsx`)
+
+## 🔭 Fases futuras
+
 - **Login/cuentas:** tabla `users` con roles; `account_id` en estudiante/profesor.
-- **Autorregistro:** flujo Lead→Estudiante listo; solo falta exponer endpoint + vista.
-- **Pagos:** entidad `Enrollment` con `payment_status`/`price`; activar módulo de
-  pasarela pluggable vía `PAYMENT_PROVIDER` y el bloque «Ingresos» del panel.
+- **Autorregistro:** flujo Lead→Estudiante listo; solo falta el endpoint + vista pública.
+- **Pagos:** `Enrollment` con `payment_status`/`price`; activar con `PAYMENT_PROVIDER`.
 
 ---
 
 ## ✅ Cumplimiento
-- **RGPD:** banner de cookies, consentimiento explícito en el formulario, registro de
-  consentimientos (`consent_logs`), textos legales (Anexo A).
-- **SEO:** metaetiquetas, Open Graph, hreflang, `sitemap.xml`, `robots.txt`, schema.org
-  (DanceSchool). Preparado para Google Tag Manager / Analytics y seguimiento de
-  conversión (formulario y clic de WhatsApp).
+
+- **RGPD:** banner de cookies, consentimiento en formulario, `consent_logs`, textos legales.
+- **SEO:** metaetiquetas, Open Graph, hreflang, `sitemap.xml`, `robots.txt`, schema.org.

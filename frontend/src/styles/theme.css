@@ -1,0 +1,109 @@
+/* Manual de marca — El Malecón de la Salsa (§2)
+   Verde neón "glow" sobre fondos oscuros, energía de club latino. */
+:root {
+  --bg: #0A0E0B;
+  --surface: #121814;
+  --surface-2: #161d18;
+  --border: #1E2622;
+  --green: #2FE56B;       /* acento principal / CTAs */
+  --green-hover: #25C75B;
+  --amber: #F59E0B;       /* acento cálido secundario */
+  --text: #F4F7F4;
+  --text-dim: #9AA39C;
+
+  --glow: 0 0 0.5rem rgba(47, 229, 107, 0.55), 0 0 1.5rem rgba(47, 229, 107, 0.25);
+  --radius: 14px;
+  --maxw: 1180px;
+
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; line-height: 1.15; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); }
+a { color: inherit; text-decoration: none; }
+
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+.section { padding: clamp(3rem, 7vw, 5.5rem) 0; }
+.section-title { margin-bottom: 0.5rem; }
+.section-title .accent { color: var(--green); }
+.section-sub { color: var(--text-dim); margin-bottom: 2.5rem; max-width: 60ch; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-head); font-weight: 600; font-size: 0.98rem;
+  padding: 0.8rem 1.5rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid transparent; transition: all 0.22s ease;
+}
+.btn-primary { background: var(--green); color: #07160c; }
+.btn-primary:hover { background: var(--green-hover); box-shadow: var(--glow); transform: translateY(-2px); }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { border-color: var(--green); box-shadow: var(--glow); color: var(--green); }
+.btn-amber { background: var(--amber); color: #1a1205; }
+.btn-amber:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+/* Tarjetas con glow en hover */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; transition: all 0.25s ease;
+}
+.card:hover { border-color: var(--green); box-shadow: var(--glow); transform: translateY(-4px); }
+.card-body { padding: 1.25rem; }
+
+.grid { display: grid; gap: 1.25rem; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+.badge {
+  display: inline-block; font-size: 0.72rem; font-weight: 600;
+  padding: 0.2rem 0.65rem; border-radius: 999px;
+  background: rgba(47,229,107,0.12); color: var(--green);
+  border: 1px solid rgba(47,229,107,0.3);
+}
+.tag-dim { color: var(--text-dim); font-size: 0.85rem; }
+
+img { max-width: 100%; display: block; }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Modal / Lightbox */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+  padding: 1.25rem; backdrop-filter: blur(4px);
+}
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); max-width: 640px; width: 100%;
+  max-height: 90vh; overflow: auto;
+}
+.modal-lg { max-width: 920px; }
+
+input, select, textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); padding: 0.7rem 0.9rem;
+  font-family: var(--font-body); font-size: 0.95rem;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); box-shadow: var(--glow); }
+label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.35rem; }
+.field { margin-bottom: 1rem; }
+
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+th { color: var(--text-dim); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }

@@ -1,0 +1,8 @@
+Coloca aquí el logo de la escuela como `logo.png` (y como favicon).
+
+El header usa /logo.png automáticamente; si el archivo no existe, muestra
+el texto "elMalecón" como respaldo. Recomendado:
+  - logo.png            → cabecera y favicon (fondo transparente)
+  - logo-og.png         → imagen Open Graph para compartir en redes (1200x630)
+
+También conviene copiar el logo a /data/media/escuela/ para el backend.

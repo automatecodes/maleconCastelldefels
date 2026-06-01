@@ -1,0 +1,17 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='640' viewBox='0 0 1024 640'>
+  <defs>
+    <radialGradient id='g' cx='30%' cy='30%' r='80%'>
+      <stop offset='0%' stop-color='#B62FE5' stop-opacity='0.35'/>
+      <stop offset='55%' stop-color='#121814' stop-opacity='1'/>
+      <stop offset='100%' stop-color='#0A0E0B' stop-opacity='1'/>
+    </radialGradient>
+  </defs>
+  <rect width='1024' height='640' fill='url(#g)'/>
+  <circle cx='820' cy='480' r='180' fill='#B62FE5' opacity='0.12'/>
+  <text x='512' y='300' font-family='Space Grotesk, Arial, sans-serif' font-size='58'
+        font-weight='700' fill='#F4F7F4' text-anchor='middle'>Reggaeton / Heels Abierto</text>
+  <text x='512' y='370' font-family='Inter, Arial, sans-serif' font-size='26'
+        fill='#B62FE5' text-anchor='middle' letter-spacing='3'>EL MALECÓN DE LA SALSA</text>
+  <text x='512' y='600' font-family='Inter, Arial, sans-serif' font-size='16'
+        fill='#9AA39C' text-anchor='middle'>imagen IA pendiente · etapa inicial</text>
+</svg>

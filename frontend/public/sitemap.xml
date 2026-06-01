@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://elmaleconcastelldefels.com/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://elmaleconcastelldefels.com/"/>
+    <xhtml:link rel="alternate" hreflang="ca" href="https://elmaleconcastelldefels.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://elmaleconcastelldefels.com/"/>
+  </url>
+  <url><loc>https://elmaleconcastelldefels.com/escuela</loc></url>
+  <url><loc>https://elmaleconcastelldefels.com/cursos</loc></url>
+  <url><loc>https://elmaleconcastelldefels.com/horarios</loc></url>
+  <url><loc>https://elmaleconcastelldefels.com/eventos</loc></url>
+  <url><loc>https://elmaleconcastelldefels.com/contacto</loc></url>
+</urlset>

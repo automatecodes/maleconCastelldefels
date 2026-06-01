@@ -1,0 +1,142 @@
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10, 14, 11, 0.82); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+.brand { display: flex; align-items: center; gap: 0.6rem; }
+.brand-logo { height: 38px; width: auto; }
+.brand-fallback { font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; color: var(--text); }
+.brand-fallback .accent, .accent { color: var(--green); }
+.main-nav { display: flex; align-items: center; gap: 1.4rem; }
+.nav-link { font-weight: 500; color: var(--text-dim); transition: color 0.2s; font-size: 0.95rem; }
+.nav-link:hover, .nav-link.active { color: var(--green); }
+.menu-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.6rem; cursor: pointer; }
+
+.lang-selector { display: flex; gap: 0.25rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.2rem; }
+.lang { background: none; border: none; color: var(--text-dim); font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 999px; cursor: pointer; }
+.lang.active { background: var(--green); color: #07160c; }
+
+@media (max-width: 860px) {
+  .menu-toggle { display: block; }
+  .main-nav {
+    position: absolute; top: 70px; left: 0; right: 0; flex-direction: column;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 1.25rem; gap: 1rem; display: none;
+  }
+  .main-nav.open { display: flex; }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; min-height: 86vh; display: flex; align-items: center; overflow: hidden; }
+.hero-video, .hero-fallback {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;
+}
+.hero-fallback {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(47,229,107,0.18), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(245,158,11,0.12), transparent 45%),
+    var(--bg);
+}
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,14,11,0.55), rgba(10,14,11,0.92)); z-index: -1; }
+.hero-content { max-width: 720px; }
+.hero h1 { margin-bottom: 1.2rem; }
+.hero h1 .accent { text-shadow: var(--glow); }
+.hero p { font-size: 1.2rem; color: var(--text); margin-bottom: 2rem; }
+.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+.pill-tag { display: inline-block; margin-bottom: 1.2rem; }
+
+/* ---------- Cards de curso / evento / profesor ---------- */
+.media-top { aspect-ratio: 16/10; background: var(--surface-2); position: relative; overflow: hidden; }
+.media-top img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.card:hover .media-top img { transform: scale(1.05); }
+.color-bar { height: 4px; width: 100%; }
+.card-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin: 0.5rem 0; }
+.price-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.75rem; }
+.price-big { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: var(--green); }
+
+.teacher-card { text-align: center; }
+.teacher-photo { aspect-ratio: 1; border-radius: 50%; width: 130px; margin: 1.25rem auto 0.5rem; object-fit: cover; background: var(--surface-2); border: 2px solid var(--border); }
+.collage { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 2rem; }
+.collage img { aspect-ratio: 1; object-fit: cover; border-radius: 10px; cursor: pointer; transition: all 0.25s; background: var(--surface-2); }
+.collage img:hover { box-shadow: var(--glow); transform: scale(1.04); }
+
+/* ---------- Carrusel ---------- */
+.carousel-frame { position: relative; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--surface-2); }
+.carousel-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.9s ease; cursor: pointer; }
+.carousel-img.active { opacity: 1; }
+.carousel-dots { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.9rem; }
+.dot { width: 9px; height: 9px; border-radius: 50%; border: none; background: var(--border); cursor: pointer; }
+.dot.active { background: var(--green); box-shadow: var(--glow); }
+
+/* ---------- Social ---------- */
+.social-card { display: block; }
+.social-thumb { position: relative; aspect-ratio: 1; background: var(--surface-2); }
+.social-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.social-thumb-empty { width: 100%; height: 100%; background: linear-gradient(135deg, var(--surface-2), var(--surface)); }
+.social-platform { position: absolute; top: 0.5rem; left: 0.5rem; font-size: 0.72rem; background: rgba(0,0,0,0.6); padding: 0.2rem 0.5rem; border-radius: 999px; }
+.social-text { font-size: 0.85rem; color: var(--text-dim); min-height: 2.5em; margin-bottom: 0.5rem;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ---------- WhatsApp FAB ---------- */
+.whatsapp-fab {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+  width: 58px; height: 58px; border-radius: 50%; background: #25D366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.5); transition: transform 0.2s;
+}
+.whatsapp-fab:hover { transform: scale(1.1); }
+
+/* ---------- Cookie banner ---------- */
+.cookie-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.cookie-actions { display: flex; gap: 0.6rem; }
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 3rem; padding: 3rem 0 1.5rem; }
+.footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
+.footer-brand { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.site-footer h4 { margin-bottom: 0.75rem; font-size: 1rem; }
+.footer-social, .footer-links { display: flex; flex-direction: column; gap: 0.4rem; }
+.footer-social a, .footer-links a { color: var(--text-dim); transition: color 0.2s; }
+.footer-social a:hover, .footer-links a:hover { color: var(--green); }
+.footer-bottom { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; }
+
+/* ---------- Modal close ---------- */
+.modal-close { position: sticky; top: 0; float: right; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; padding: 1rem; z-index: 5; }
+.modal-content { padding: 0 1.5rem 1.5rem; }
+.modal-img { width: 100%; border-radius: 10px; margin-bottom: 1rem; }
+
+/* ---------- Calendario ---------- */
+.cal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.cal-tab { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 0.5rem 1.2rem; border-radius: 999px; cursor: pointer; font-weight: 600; }
+.cal-tab.active { background: var(--green); color: #07160c; border-color: var(--green); }
+.cal-filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.cal-filters select { width: auto; min-width: 160px; }
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
+.week-col { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem; min-height: 120px; }
+.week-day { font-family: var(--font-head); font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; text-align: center; }
+.cal-cell { border-radius: 8px; padding: 0.5rem; margin-bottom: 0.4rem; cursor: pointer; color: #07160c; font-weight: 600; font-size: 0.8rem; transition: transform 0.15s; }
+.cal-cell:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.cal-cell .cell-time { font-size: 0.7rem; opacity: 0.8; font-weight: 500; }
+@media (max-width: 760px) { .week-grid { grid-template-columns: 1fr; } }
+
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; }
+.month-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; min-height: 90px; padding: 0.4rem; font-size: 0.8rem; }
+.month-num { color: var(--text-dim); font-size: 0.75rem; }
+.month-dot { font-size: 0.68rem; border-radius: 5px; padding: 0.1rem 0.3rem; margin-top: 0.2rem; color: #07160c; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* ---------- Tabla de precios ---------- */
+.price-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-top: 1rem; }
+
+/* ---------- Legal ---------- */
+.legal-content { max-width: 760px; }
+.legal-content h2 { margin: 2rem 0 1rem; }
+.legal-content h3 { margin: 1.5rem 0 0.5rem; color: var(--green); }
+.legal-content p, .legal-content li { color: var(--text-dim); margin-bottom: 0.75rem; }
+.legal-content ul { padding-left: 1.25rem; }

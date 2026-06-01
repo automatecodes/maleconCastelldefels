@@ -1,0 +1,47 @@
+"""Punto de entrada de la API de El Malecón de la Salsa."""
+import os
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+from app.core.config import settings
+from app.core.database import Base, engine
+import app.models  # noqa: F401  (registra todas las tablas)
+from app.routers import (
+    auth, public, students, teachers, courses, events, leads, enrollments,
+    stats, media, images, themes,
+)
+
+app = FastAPI(title="El Malecón de la Salsa — API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"] if settings.ENV == "development" else [f"https://{settings.DOMAIN}"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
+    os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "app": settings.APP_NAME}
+
+
+# Servir media (imágenes, vídeos, CV en PDF, etc.)
+if os.path.isdir(settings.MEDIA_ROOT):
+    app.mount("/media", StaticFiles(directory=settings.MEDIA_ROOT), name="media")
+
+for r in (auth, public, students, teachers, courses, events, leads, enrollments,
+          stats, media, images, themes):
+    app.include_router(r.router)
+
+# Endpoints públicos del tema activo (/api/public/theme, /api/public/theme.css)
+app.include_router(themes.public_router)

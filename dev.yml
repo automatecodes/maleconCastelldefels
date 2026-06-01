@@ -1,0 +1,22 @@
+# Override para desarrollo local: expone puertos y desactiva el proxy externo.
+# Uso:  docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  api:
+    environment:
+      ENV: development
+    ports:
+      - "8000:8000"
+
+  frontend:
+    ports:
+      - "8080:80"
+    networks:
+      - internal
+
+networks:
+  proxyNet:
+    external: false

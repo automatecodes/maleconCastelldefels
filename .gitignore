@@ -1,0 +1,56 @@
+# =====================================================
+# .gitignore — El Malecón de Castelldefels
+# =====================================================
+
+# --- Seguridad: nunca subir al repositorio ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# --- Base de datos local (volumen PostgreSQL) -------
+data/db/
+
+# --- Dependencias y entornos virtuales --------------
+node_modules/
+.venv/
+venv/
+
+# --- Artefactos de build ----------------------------
+dist/
+*.egg-info/
+*.pyc
+*.pyo
+__pycache__/
+
+# --- Herramientas de desarrollo Python --------------
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Media subida (mantener estructura con .gitkeep) -
+data/media/**/*.jpg
+data/media/**/*.jpeg
+data/media/**/*.png
+data/media/**/*.webp
+data/media/**/*.avif
+data/media/**/*.gif
+data/media/**/*.mp4
+data/media/**/*.mov
+data/media/**/*.webm
+data/media/**/*.pdf
+
+# --- Logs -------------------------------------------
+*.log
+
+# --- IDE / OS / herramientas locales ----------------
+.claude/
+.DS_Store
+Thumbs.db
+*:Zone.Identifier

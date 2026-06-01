@@ -16,6 +16,10 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(_to_bytes(password), bcrypt.gensalt()).decode("utf-8")
 
 
+# Alias compatible con el nombre convencional de FastAPI
+get_password_hash = hash_password
+
+
 def verify_password(plain: str, hashed: str) -> bool:
     try:
         return bcrypt.checkpw(_to_bytes(plain), hashed.encode("utf-8"))

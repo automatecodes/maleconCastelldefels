@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     # Media
     MEDIA_ROOT: str = "/data/media"
 
+    # Permite sobreescribir la URL de BD directamente (útil para tests con SQLite)
+    DATABASE_URL: str = ""
+
     # Temas / hojas de estilo seleccionables desde el admin.
     # Si se deja vacío, se usa frontend/src/styles del repositorio.
     THEMES_DIR: str = ""
@@ -76,6 +79,8 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
         return (
             f"postgresql+psycopg2://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

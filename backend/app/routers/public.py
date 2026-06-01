@@ -1,7 +1,7 @@
 """Endpoints públicos consumidos por la web (sin autenticación)."""
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -38,7 +38,10 @@ def list_courses(db: Session = Depends(get_db)):
 
 @router.get("/courses/{slug}", response_model=CourseOut)
 def get_course(slug: str, db: Session = Depends(get_db)):
-    return db.query(Course).filter(Course.slug == slug).first()
+    course = db.query(Course).filter(Course.slug == slug).first()
+    if not course:
+        raise HTTPException(404, "Curso no encontrado")
+    return course
 
 
 @router.get("/teachers", response_model=list[TeacherOut])

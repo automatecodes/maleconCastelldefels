@@ -4,6 +4,16 @@ from decimal import Decimal
 from pydantic import BaseModel
 
 
+# ---------- Referencia breve (para evitar circularidad) ----------
+class CourseBrief(BaseModel):
+    id: int
+    slug: str
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
 # ---------- Profesor ----------
 class TeacherBase(BaseModel):
     slug: str
@@ -26,6 +36,7 @@ class TeacherCreate(TeacherBase):
 
 class TeacherOut(TeacherBase):
     id: int
+    courses: list[CourseBrief] = []
 
     class Config:
         from_attributes = True

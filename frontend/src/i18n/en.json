@@ -39,7 +39,7 @@
     "social": "Follow us",
     "socialSub": "The latest from our social media.",
     "clubTitle": "More than a school, a social club",
-    "clubText": "El Malecón is community: we dance, share and celebrate together. Come meet us."
+    "clubText": "elMalecón Castelldefels is community: we dance, share and celebrate together. Come meet us."
   },
   "school": {
     "title": "The School",
@@ -131,7 +131,8 @@
     "leads": "Leads",
     "logout": "Log out",
     "stats": "Statistics",
-    "appearance": "Appearance"
+    "appearance": "Appearance",
+    "media": "Media"
   },
   "appearance": {
     "title": "Appearance",

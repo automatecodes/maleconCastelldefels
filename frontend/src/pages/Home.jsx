@@ -11,14 +11,20 @@ import salsaVideo from '../media/bailandoSalsa.optimize.mp4'
 export default function Home() {
   const { t } = useTranslation()
   const [courses, setCourses] = useState([])
+  const [allCourses, setAllCourses] = useState([])
   const [events, setEvents] = useState([])
   const [social, setSocial] = useState([])
 
   useEffect(() => {
-    getCourses().then((c) => setCourses(c.filter((x) => x.featured).slice(0, 3))).catch(() => {})
-    getEvents().then((e) => setEvents(e.filter((x) => x.status !== 'pasado').slice(0, 2))).catch(() => {})
+    getCourses().then((c) => {
+      setAllCourses(c)
+      setCourses(c.filter((x) => x.featured).slice(0, 3))
+    }).catch(() => {})
+    getEvents().then((e) => setEvents(e.filter((x) => x.computed_status === 'próximo').slice(0, 2))).catch(() => {})
     getSocial().then((s) => setSocial(s.slice(0, 4))).catch(() => {})
   }, [])
+
+  const proximaApertura = allCourses.filter((c) => c.status === 'próxima apertura')
 
   return (
     <>
@@ -43,6 +49,46 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Próxima apertura */}
+      {proximaApertura.length > 0 && (
+        <section className="section container">
+          <Reveal>
+            <h2 className="section-title">
+              {(() => {
+                const words = 'Próximamente'.split(' ')
+                if (words.length === 1) return <span className="accent">{words[0]}</span>
+                return (
+                  <>
+                    {words.slice(0, -1).join(' ')}{' '}
+                    <span className="accent">{words[words.length - 1]}</span>
+                  </>
+                )
+              })()}
+            </h2>
+          </Reveal>
+          <div className="grid grid-3">
+            {proximaApertura.map((c) => (
+              <Reveal key={c.id}>
+                <div className="card">
+                  {c.image_url && (
+                    <div className="media-top">
+                      <img src={c.image_url} alt={c.name} onError={(e) => { e.target.style.opacity = 0.15 }} />
+                    </div>
+                  )}
+                  <div className="card-body">
+                    <span className="badge" style={{ background: 'rgba(245,158,11,0.18)', color: '#F59E0B', marginBottom: '0.5rem', display: 'inline-block' }}>
+                      Próxima apertura
+                    </span>
+                    <h3 style={{ margin: '0.25rem 0' }}>{c.name}</h3>
+                    {c.level && <p className="tag-dim">{c.level}</p>}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Cursos destacados */}
       <section className="section container">

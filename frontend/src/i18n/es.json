@@ -39,7 +39,7 @@
     "social": "Síguenos",
     "socialSub": "Lo último de nuestras redes.",
     "clubTitle": "Más que una escuela, un club social",
-    "clubText": "El Malecón es comunidad: bailamos, compartimos y celebramos juntos. Ven a conocernos."
+    "clubText": "elMalecón Castelldefels es comunidad: bailamos, compartimos y celebramos juntos. Ven a conocernos."
   },
   "school": {
     "title": "La Escuela",
@@ -131,7 +131,8 @@
     "leads": "Leads",
     "logout": "Salir",
     "stats": "Estadísticas",
-    "appearance": "Apariencia"
+    "appearance": "Apariencia",
+    "media": "Media"
   },
   "appearance": {
     "title": "Apariencia",

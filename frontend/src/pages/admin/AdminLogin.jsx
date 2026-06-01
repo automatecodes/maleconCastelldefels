@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { login } from '../../api/client'
 
-export default function AdminLogin() {
+export default function AdminLogin({ adminBase = '/gurutiadmin' }) {
   const { t } = useTranslation()
   const nav = useNavigate()
   const [email, setEmail] = useState('')
@@ -11,8 +11,8 @@ export default function AdminLogin() {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (localStorage.getItem('token')) nav('/admin/dashboard')
-  }, [nav])
+    if (localStorage.getItem('token')) nav(`${adminBase}/dashboard`)
+  }, [nav, adminBase])
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -20,7 +20,7 @@ export default function AdminLogin() {
     try {
       const { access_token } = await login(email, password)
       localStorage.setItem('token', access_token)
-      nav('/admin/dashboard')
+      nav(`${adminBase}/dashboard`)
     } catch {
       setError(true)
     }
@@ -29,6 +29,8 @@ export default function AdminLogin() {
   return (
     <div className="admin-login">
       <form className="card" style={{ padding: '2.5rem', width: '100%', maxWidth: 380 }} onSubmit={onSubmit}>
+        <img src="/logo.png" alt="elMalecón" style={{ height: 48, marginBottom: '0.75rem' }}
+          onError={(e) => { e.target.style.display = 'none' }} />
         <div className="brand-fallback" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>
           el<span className="accent">Malecón</span>
         </div>

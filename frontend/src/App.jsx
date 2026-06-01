@@ -22,9 +22,12 @@ import CoursesAdmin from './pages/admin/CoursesAdmin'
 import EventsAdmin from './pages/admin/EventsAdmin'
 import LeadsAdmin from './pages/admin/LeadsAdmin'
 import Appearance from './pages/admin/Appearance'
+import MediaAdmin from './pages/admin/MediaAdmin'
 
 import './styles/layout.css'
 import './styles/admin.css'
+
+const ADMIN = '/gurutiadmin'
 
 function PublicLayout({ children }) {
   return (
@@ -42,8 +45,6 @@ export default function App() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
 
-  // Inyecta la hoja de estilos activa (seleccionable desde el admin) como
-  // último <link> del documento, de modo que pueda sobreescribir los estilos base.
   useEffect(() => {
     let link = document.getElementById('active-theme')
     if (!link) {
@@ -65,9 +66,9 @@ export default function App() {
       <Route path="/contacto" element={<PublicLayout><Contact /></PublicLayout>} />
       <Route path="/legal/:doc" element={<PublicLayout><Legal /></PublicLayout>} />
 
-      {/* Administración */}
-      <Route path="/admin" element={<AdminLogin />} />
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* Administración — URL privada */}
+      <Route path={ADMIN} element={<AdminLogin adminBase={ADMIN} />} />
+      <Route path={ADMIN} element={<AdminLayout adminBase={ADMIN} />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="estudiantes" element={<StudentsAdmin />} />
         <Route path="profesores" element={<TeachersAdmin />} />
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="eventos" element={<EventsAdmin />} />
         <Route path="leads" element={<LeadsAdmin />} />
         <Route path="apariencia" element={<Appearance />} />
+        <Route path="media" element={<MediaAdmin />} />
       </Route>
     </Routes>
   )

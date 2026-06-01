@@ -21,8 +21,15 @@ router = APIRouter(prefix="/api/admin/themes", tags=["admin:themes"],
 public_router = APIRouter(prefix="/api/public", tags=["public:theme"])
 
 
+CSS_VAR_PREFIX = "CSS_VAR_"
+
+
 class ThemeSelection(BaseModel):
     active: str = ""
+
+
+class CssVars(BaseModel):
+    vars: dict[str, str] = {}
 
 
 def _list_css_files() -> list[str]:
@@ -58,6 +65,65 @@ def set_active_theme(payload: ThemeSelection, db: Session = Depends(get_db)):
     return {"active": name}
 
 
+@router.get("/variables")
+def get_css_vars(db: Session = Depends(get_db)):
+    """Devuelve las variables CSS personalizadas guardadas en site_settings."""
+    rows = db.query(SiteSetting).filter(
+        SiteSetting.key.startswith(CSS_VAR_PREFIX)
+    ).all()
+    return {"vars": {r.key[len(CSS_VAR_PREFIX):]: r.value for r in rows}}
+
+
+@router.put("/variables")
+def set_css_vars(payload: CssVars, db: Session = Depends(get_db)):
+    """Guarda variables CSS personalizadas en site_settings."""
+    for name, value in payload.vars.items():
+        key = f"{CSS_VAR_PREFIX}{name}"
+        row = db.get(SiteSetting, key)
+        if row:
+            row.value = value
+        else:
+            db.add(SiteSetting(key=key, value=value))
+    db.commit()
+    return {"saved": len(payload.vars)}
+
+
+@router.get("/export")
+def export_theme(db: Session = Depends(get_db)):
+    """Exporta todas las variables del tema activo + personalizaciones."""
+    import re
+    name = _get_active(db)
+    base_vars: dict[str, str] = {}
+    if name and name in _list_css_files():
+        css = (settings.themes_path / name).read_text(encoding="utf-8")
+        for m in re.finditer(r"--([\w-]+)\s*:\s*([^;]+);", css):
+            base_vars[f"--{m.group(1)}"] = m.group(2).strip()
+    # Sobreescribir con personalizaciones guardadas
+    rows = db.query(SiteSetting).filter(
+        SiteSetting.key.startswith(CSS_VAR_PREFIX)
+    ).all()
+    for r in rows:
+        base_vars[f"--{r.key[len(CSS_VAR_PREFIX):]}"] = r.value
+    from fastapi.responses import JSONResponse
+    return JSONResponse({"theme": name, "vars": base_vars})
+
+
+@router.post("/import")
+def import_theme(payload: CssVars, db: Session = Depends(get_db)):
+    """Importa variables CSS desde JSON y las persiste."""
+    for name, value in payload.vars.items():
+        # Acepta tanto '--green' como 'green'
+        clean = name.lstrip("-")
+        key = f"{CSS_VAR_PREFIX}{clean}"
+        row = db.get(SiteSetting, key)
+        if row:
+            row.value = value
+        else:
+            db.add(SiteSetting(key=key, value=value))
+    db.commit()
+    return {"imported": len(payload.vars)}
+
+
 @public_router.get("/theme")
 def active_theme(db: Session = Depends(get_db)):
     return {"active": _get_active(db)}
@@ -65,9 +131,18 @@ def active_theme(db: Session = Depends(get_db)):
 
 @public_router.get("/theme.css")
 def active_theme_css(db: Session = Depends(get_db)):
-    """Devuelve el contenido del CSS activo (vacío si no hay ninguno)."""
+    """CSS activo + variables personalizadas inyectadas en :root."""
     name = _get_active(db)
     css = ""
-    if name and name in _list_css_files():  # valida y evita path traversal
+    if name and name in _list_css_files():
         css = (settings.themes_path / name).read_text(encoding="utf-8")
+    # Inyectar personalizaciones
+    rows = db.query(SiteSetting).filter(
+        SiteSetting.key.startswith(CSS_VAR_PREFIX)
+    ).all()
+    if rows:
+        overrides = "\n".join(
+            f"  --{r.key[len(CSS_VAR_PREFIX):]}: {r.value};" for r in rows
+        )
+        css = f":root {{\n{overrides}\n}}\n" + css
     return Response(content=css, media_type="text/css")

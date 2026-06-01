@@ -57,14 +57,27 @@ def schedule(db: Session = Depends(get_db)):
     return db.query(ClassSession).all()
 
 
-@router.get("/events", response_model=list[EventOut])
+@router.get("/events")
 def list_events(db: Session = Depends(get_db)):
-    return db.query(Event).order_by(Event.date.desc()).all()
+    from datetime import date
+    events = db.query(Event).order_by(Event.date.desc()).all()
+    result = []
+    for e in events:
+        d = EventOut.model_validate(e).model_dump()
+        d["computed_status"] = "histórico" if (e.date and e.date < date.today()) else "próximo"
+        result.append(d)
+    return result
 
 
-@router.get("/events/{slug}", response_model=EventOut)
+@router.get("/events/{slug}")
 def get_event(slug: str, db: Session = Depends(get_db)):
-    return db.query(Event).filter(Event.slug == slug).first()
+    from datetime import date
+    e = db.query(Event).filter(Event.slug == slug).first()
+    if not e:
+        return None
+    d = EventOut.model_validate(e).model_dump()
+    d["computed_status"] = "histórico" if (e.date and e.date < date.today()) else "próximo"
+    return d
 
 
 @router.get("/social", response_model=list[SocialPostOut])

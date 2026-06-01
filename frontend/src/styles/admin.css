@@ -13,6 +13,8 @@
   border-right: 1px solid var(--border); padding: 1.5rem 1rem;
   display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
 }
+.admin-brand-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+.admin-logo { height: 36px; width: auto; }
 .admin-brand { font-size: 1.4rem; }
 .admin-nav { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 1.5rem; flex: 1; }
 .admin-link {

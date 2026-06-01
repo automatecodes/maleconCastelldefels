@@ -27,11 +27,12 @@ class Student(Base):
     # Académico
     current_level = Column(String, nullable=True)
     enroll_date = Column(Date, nullable=True)
-    # lead / prueba / activo / baja / lista de espera
-    status = Column(String, default="lead", nullable=False)
+    contact_date = Column(Date, nullable=True)       # fecha primer contacto
+    # inscrito / interesado / graduado / baja
+    status = Column(String, default="interesado", nullable=False)
 
     # Captación
-    lead_source = Column(String, nullable=True)  # whatsapp/web/redes/recomendacion/evento
+    lead_source = Column(String, nullable=True)  # web/whatsapp/redes/escuela/contactos
 
     # Seguimiento
     notes = Column(Text, nullable=True)

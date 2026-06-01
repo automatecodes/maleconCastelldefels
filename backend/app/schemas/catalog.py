@@ -120,6 +120,7 @@ class EventCreate(EventBase):
 class EventOut(EventBase):
     id: int
     photos: list[EventPhotoOut] = []
+    computed_status: str | None = None   # próximo / histórico (calculado por fecha)
 
     class Config:
         from_attributes = True

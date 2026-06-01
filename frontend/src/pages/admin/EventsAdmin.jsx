@@ -2,7 +2,10 @@ import CrudTable from './CrudTable'
 import AiImageButton from './AiImageButton'
 import { generateEventImage } from '../../api/client'
 
-const STATUSES = ['proximo', 'publicado', 'pasado']
+const statusStyle = (s) => {
+  if (s === 'próximo') return { background: 'rgba(47,229,107,0.18)', color: '#2FE56B' }
+  return { background: 'rgba(120,120,120,0.18)', color: '#888' }
+}
 
 export default function EventsAdmin() {
   return (
@@ -12,12 +15,23 @@ export default function EventsAdmin() {
       rowActions={(row, reload) => (
         <AiImageButton onGenerate={() => generateEventImage(row.id)} reload={reload} />
       )}
-      empty={{ status: 'proximo' }}
+      empty={{ status: 'próximo' }}
       columns={[
         { key: 'name', label: 'Nombre' },
         { key: 'date', label: 'Fecha' },
         { key: 'location', label: 'Ubicación' },
-        { key: 'status', label: 'Estado', render: (r) => <span className="badge">{r.status}</span> },
+        {
+          key: 'computed_status',
+          label: 'Estado',
+          render: (r) => {
+            const s = r.computed_status || r.status || ''
+            return (
+              <span className="badge" style={statusStyle(s)}>
+                {s}
+              </span>
+            )
+          },
+        },
       ]}
       toPayload={(f) => ({ ...f, price: f.price ? Number(f.price) : null })}
       fields={[
@@ -34,7 +48,6 @@ export default function EventsAdmin() {
         { name: 'styles', label: 'Estilos' },
         { name: 'activities', label: 'Actividades (una por línea)', type: 'textarea' },
         { name: 'notes', label: 'Notas', type: 'textarea' },
-        { name: 'status', label: 'Estado', type: 'select', options: STATUSES.map((s) => ({ value: s, label: s })) },
       ]}
     />
   )

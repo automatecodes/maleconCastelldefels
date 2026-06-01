@@ -1,39 +1,44 @@
 import { useEffect, useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getMe } from '../../api/client'
 
-export default function AdminLayout() {
+export default function AdminLayout({ adminBase = '/gurutiadmin' }) {
   const { t } = useTranslation()
   const nav = useNavigate()
   const [ok, setOk] = useState(false)
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) { nav('/admin'); return }
+    if (!localStorage.getItem('token')) { nav(adminBase); return }
     getMe().then(() => setOk(true)).catch(() => {
       localStorage.removeItem('token')
-      nav('/admin')
+      nav(adminBase)
     })
-  }, [nav])
+  }, [nav, adminBase])
 
-  const logout = () => { localStorage.removeItem('token'); nav('/admin') }
+  const logout = () => { localStorage.removeItem('token'); nav(adminBase) }
 
   if (!ok) return <div className="admin-login">{t('common.loading')}</div>
 
   const links = [
-    { to: '/admin/dashboard', key: 'dashboard' },
-    { to: '/admin/estudiantes', key: 'students' },
-    { to: '/admin/profesores', key: 'teachers' },
-    { to: '/admin/cursos', key: 'courses' },
-    { to: '/admin/eventos', key: 'events' },
-    { to: '/admin/leads', key: 'leads' },
-    { to: '/admin/apariencia', key: 'appearance' },
+    { to: `${adminBase}/dashboard`, key: 'dashboard' },
+    { to: `${adminBase}/estudiantes`, key: 'students' },
+    { to: `${adminBase}/profesores`, key: 'teachers' },
+    { to: `${adminBase}/cursos`, key: 'courses' },
+    { to: `${adminBase}/eventos`, key: 'events' },
+    { to: `${adminBase}/leads`, key: 'leads' },
+    { to: `${adminBase}/media`, key: 'media' },
+    { to: `${adminBase}/apariencia`, key: 'appearance' },
   ]
 
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="brand-fallback admin-brand">el<span className="accent">Malecón</span></div>
+        <Link to="/" className="admin-brand-link">
+          <img src="/logo.png" alt="elMalecón" className="admin-logo"
+            onError={(e) => { e.target.style.display = 'none' }} />
+          <span className="brand-fallback admin-brand">el<span className="accent">Malecón</span></span>
+        </Link>
         <span className="tag-dim" style={{ fontSize: '0.75rem' }}>{t('common.admin')}</span>
         <nav className="admin-nav">
           {links.map((l) => (

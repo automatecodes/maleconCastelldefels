@@ -10,3 +10,4 @@ from app.models.lead import Lead  # noqa: F401
 from app.models.social import SocialPost  # noqa: F401
 from app.models.consent import ConsentLog  # noqa: F401
 from app.models.setting import SiteSetting  # noqa: F401
+from app.models.media import MediaFile  # noqa: F401

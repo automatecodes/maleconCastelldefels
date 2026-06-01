@@ -161,4 +161,10 @@
 .legal-content h2 { margin: 2rem 0 1rem; }
 .legal-content h3 { margin: 1.5rem 0 0.5rem; color: var(--green); }
 .legal-content p, .legal-content li { color: var(--text-dim); margin-bottom: 0.75rem; }
+
+/* Footer social icons row */
+.footer-social-icons { display: flex; gap: 0.75rem; align-items: center; margin: 0.5rem 0; }
+.footer-social-icon { color: var(--text-dim); transition: color 0.2s; display: flex; align-items: center; }
+.footer-social-icon:hover { color: var(--green); }
+.footer-social-icon svg { width: 20px; height: 20px; fill: currentColor; }
 .legal-content ul { padding-left: 1.25rem; }

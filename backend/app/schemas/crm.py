@@ -4,6 +4,18 @@ from decimal import Decimal
 from pydantic import BaseModel, EmailStr
 
 
+# ---------- Inscripción breve (para anidar en StudentOut) ----------
+class EnrollmentBrief(BaseModel):
+    id: int
+    course_id: int | None = None
+    course_name: str | None = None
+    status: str
+    enroll_date: date | None = None
+
+    class Config:
+        from_attributes = True
+
+
 # ---------- Estudiante ----------
 class StudentBase(BaseModel):
     first_name: str
@@ -18,7 +30,10 @@ class StudentBase(BaseModel):
     postal_code: str | None = None
     current_level: str | None = None
     enroll_date: date | None = None
-    status: str = "lead"
+    contact_date: date | None = None
+    # inscrito / interesado / graduado / baja
+    status: str = "interesado"
+    # web / whatsapp / redes / escuela / contactos
     lead_source: str | None = None
     notes: str | None = None
     tags: str | None = None
@@ -32,6 +47,7 @@ class StudentCreate(StudentBase):
 
 class StudentOut(StudentBase):
     id: int
+    enrollments: list[EnrollmentBrief] = []
 
     class Config:
         from_attributes = True

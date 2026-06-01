@@ -20,10 +20,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container header-inner">
         <NavLink to="/" className="brand" onClick={() => setOpen(false)}>
-          {/* El logo lo sube el cliente: colócalo en frontend/public/logo.png */}
-          <img src="/logo.png" alt="El Malecón de la Salsa" className="brand-logo"
-               onError={(e) => { e.target.style.display = 'none' }} />
-          <span className="brand-fallback">el<span className="accent">Malecón</span></span>
+          <img src="/logo.png" alt="El Malecón de la Salsa" className="brand-logo" />
         </NavLink>
 
         <button className="menu-toggle" onClick={() => setOpen(!open)} aria-label="Menú">

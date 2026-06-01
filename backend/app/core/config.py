@@ -46,8 +46,9 @@ class Settings(BaseSettings):
     TIKTOK_TOKEN: str = ""
 
     # Generación de imágenes IA
-    IMAGE_AI_PROVIDER: str = ""
-    IMAGE_AI_KEY: str = ""
+    IMAGE_AI_PROVIDER: str = ""  # claude | openai | stability | (vacío → placeholder)
+    IMAGE_AI_KEY: str = ""       # clave del proveedor (para openai/stability)
+    ANTHROPIC_API_KEY: str = ""  # API key de Anthropic (para proveedor claude)
     IMAGE_AI_MODEL: str = ""
     IMAGE_AI_SIZE: str = "1024x1024"
 

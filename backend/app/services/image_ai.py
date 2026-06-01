@@ -1,13 +1,19 @@
 """Generación automática de imágenes (IA) — módulo pluggable (§3.3 / §6).
 
 Proveedor configurable por `.env`:
-  IMAGE_AI_PROVIDER = openai | stability | (vacío → placeholder local)
-  IMAGE_AI_KEY      = clave del proveedor
+  IMAGE_AI_PROVIDER = claude | openai | stability | (vacío → placeholder local)
+  ANTHROPIC_API_KEY = clave de Anthropic  (proveedor claude)
+  IMAGE_AI_KEY      = clave del proveedor (openai / stability)
   IMAGE_AI_MODEL    = (opcional) modelo del proveedor
 
-Sin clave válida, genera un placeholder SVG con la marca (verde neón sobre fondo
-oscuro) para no bloquear la etapa inicial. Todas las imágenes se guardan en
-/data/media/<folder>/ y la función devuelve la URL pública (/media/...).
+claude:     Genera SVG de alta calidad usando Claude API.
+            Modelo por defecto: claude-haiku-4-5-20251001 (rápido y económico).
+openai:     Genera PNG con gpt-image-1 o DALL-E.
+stability:  Genera PNG con Stable Diffusion Core.
+(vacío):    Placeholder SVG offline con la estética de marca.
+
+Todas las imágenes se guardan en /data/media/<folder>/ y la función devuelve
+la URL pública (/media/...).
 """
 import base64
 import html
@@ -37,6 +43,37 @@ def _save_bytes(folder: str, basename: str, ext: str, data: bytes) -> str:
 # --------------------------------------------------------------------------- #
 #  Proveedores
 # --------------------------------------------------------------------------- #
+def _claude(prompt: str) -> tuple[bytes, str]:
+    """Genera SVG artístico con Claude API. Requiere ANTHROPIC_API_KEY."""
+    import re
+    import anthropic as ant_sdk
+
+    model = settings.IMAGE_AI_MODEL or "claude-haiku-4-5-20251001"
+    client = ant_sdk.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    message = client.messages.create(
+        model=model,
+        max_tokens=4096,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"Create a complete self-contained SVG illustration (1024×640px) for: {prompt}\n\n"
+                "Design requirements:\n"
+                "- Dark background (#0A0E0B), neon green accents (#2FE56B), golden highlights (#F59E0B)\n"
+                "- Latin dance / salsa club aesthetic, vibrant and energetic\n"
+                "- Rich visuals: gradient backgrounds, geometric shapes, silhouettes, decorative elements\n"
+                "- Use <defs> with gradients and filters for depth and glow effects\n"
+                "- IMPORTANT: Return ONLY the raw SVG code, starting with <svg and ending with </svg>. "
+                "No markdown, no explanation."
+            ),
+        }],
+    )
+    svg_text = message.content[0].text.strip()
+    match = re.search(r"<svg[\s\S]*?</svg>", svg_text, re.IGNORECASE)
+    if match:
+        svg_text = match.group(0)
+    return svg_text.encode("utf-8"), "svg"
+
+
 def _openai(prompt: str, size: str) -> tuple[bytes, str]:
     model = settings.IMAGE_AI_MODEL or "gpt-image-1"
     resp = httpx.post(
@@ -102,7 +139,9 @@ def generate_image(prompt: str, folder: str, basename: str, *,
     provider = (settings.IMAGE_AI_PROVIDER or "").lower()
     fallback = False
     try:
-        if provider == "openai" and settings.IMAGE_AI_KEY:
+        if provider == "claude" and settings.ANTHROPIC_API_KEY:
+            data, ext = _claude(prompt)
+        elif provider == "openai" and settings.IMAGE_AI_KEY:
             data, ext = _openai(prompt, size)
         elif provider == "stability" and settings.IMAGE_AI_KEY:
             data, ext = _stability(prompt, size)

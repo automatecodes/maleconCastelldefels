@@ -54,3 +54,4 @@ data/media/**/*.pdf
 .DS_Store
 Thumbs.db
 *:Zone.Identifier
+notes.md

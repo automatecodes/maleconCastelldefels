@@ -115,16 +115,25 @@ docker compose exec api python -m app.seed
 
 ## 🎨 Generación de imágenes con IA (§3.3)
 
-Módulo **pluggable** por `.env`:
+Módulo **pluggable** por `.env`. Soporta tres proveedores:
+
+| Proveedor   | Variable clave      | Resultado | Notas                                            |
+|-------------|---------------------|-----------|--------------------------------------------------|
+| `claude`    | `ANTHROPIC_API_KEY` | SVG       | **Recomendado** — arte vectorial de alta calidad |
+| `openai`    | `IMAGE_AI_KEY`      | PNG       | Usa gpt-image-1 o DALL-E                         |
+| `stability` | `IMAGE_AI_KEY`      | PNG       | Stable Diffusion Core                            |
+| *(vacío)*   | —                   | SVG       | Placeholder de marca offline                     |
+
+### Configuración recomendada (Claude)
+
+```env
+IMAGE_AI_PROVIDER=claude
+ANTHROPIC_API_KEY=sk-ant-...
+IMAGE_AI_MODEL=claude-haiku-4-5-20251001   # opcional, usa haiku por defecto
 ```
-IMAGE_AI_PROVIDER=openai      # openai | stability | (vacío → placeholder de marca)
-IMAGE_AI_KEY=sk-...
-IMAGE_AI_MODEL=gpt-image-1    # opcional
-IMAGE_AI_SIZE=1024x1024
-```
-- **Sin clave** genera un *placeholder SVG* con la estética de marca (verde neón sobre
-  fondo oscuro) — funciona offline y nunca rompe el alta.
-- **Con clave** llama al proveedor, descarga la imagen y la guarda en `data/media/`.
+> Claude no genera imágenes raster (PNG/JPEG) pero produce SVG artísticos de alta
+> calidad con gradientes, sombras y la estética de marca del Malecón. Para imágenes
+> fotorrealistas usa OpenAI o Stability AI.
 
 Formas de usar:
 - **Admin** → en *Cursos* y *Eventos*, botón **✨** en cada fila (genera y asigna la imagen).

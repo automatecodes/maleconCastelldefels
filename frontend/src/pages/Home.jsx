@@ -6,6 +6,7 @@ import { whatsappLink } from '../components/WhatsAppButton'
 import Reveal from '../components/Reveal'
 import SocialFeed from '../components/SocialFeed'
 import CourseCard from '../components/CourseCard'
+import salsaVideo from '../media/bailandoSalsa.optimize.mp4'
 
 export default function Home() {
   const { t } = useTranslation()
@@ -23,9 +24,9 @@ export default function Home() {
     <>
       {/* Hero con vídeo de fondo */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline poster="/media/escuela/hero-poster.jpg"
+        <video className="hero-video" autoPlay muted loop playsInline
           onError={(e) => { e.target.style.display = 'none' }}>
-          <source src="/media/escuela/hero.mp4" type="video/mp4" />
+          <source src={salsaVideo} type="video/mp4" />
         </video>
         <div className="hero-fallback" />
         <div className="hero-overlay" />

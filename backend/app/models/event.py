@@ -1,5 +1,5 @@
 """Evento y sus fotos de galería."""
-from sqlalchemy import Column, Integer, String, Text, Date, DateTime, Numeric, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Text, Boolean, Date, DateTime, Numeric, ForeignKey, func
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base

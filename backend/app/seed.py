@@ -266,9 +266,10 @@ def run():
         # ── Publicaciones sociales placeholder ───────────────────────────────
         if db.query(models.SocialPost).count() == 0:
             for platform, text_body, permalink in [
-                ("instagram", "🎉 ¡Guarachando Noche 10 aniversario! 20 de junio. Entradas limitadas.", "https://instagram.com/elmaleconcastelldefels"),
-                ("facebook",  "🌴 Cursos intensivos de salsa y bachata en Castelldefels. Matrícula gratis.", "https://facebook.com/elmalecondelasalsa"),
-                ("youtube",   "Clases de Salsa Cubana — elMalecón Castelldefels", "https://youtube.com/@elmaleconcastelldefels"),
+                ("instagram", "🎉 ¡Guarachando Noche 10 aniversario! 20 de junio. Entradas limitadas.", "https://www.instagram.com/elmalecondelasalsa/"),
+                ("facebook",  "🌴 Cursos intensivos de salsa y bachata en Castelldefels. Matrícula gratis.", "https://www.facebook.com/elmalecondelasalsa/"),
+                ("youtube",   "Clases de Salsa Cubana — elMalecón Castelldefels", "https://www.youtube.com/@elMalecondelaSalsa"),
+                ("tiktok",    "💃 Salsa, bachata y buen ambiente en Castelldefels. ¡Síguenos!", "https://www.tiktok.com/@elmalecondelasalsa"),
             ]:
                 db.add(models.SocialPost(platform=platform, text=text_body,
                                          permalink=permalink, published_at=datetime.now()))

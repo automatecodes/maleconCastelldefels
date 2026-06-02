@@ -84,8 +84,9 @@ class Settings(BaseSettings):
     def themes_path(self) -> Path:
         if self.THEMES_DIR:
             return Path(self.THEMES_DIR)
-        # backend/app/core/config.py -> raíz del repo (parents[3]) -> frontend/src/styles/themes
-        return Path(__file__).resolve().parents[3] / "frontend" / "src" / "styles" / "themes"
+        # config.py -> app/core -> app -> /app (workdir) -> themes/
+        # Funciona tanto en local como en Docker (COPY . . incluye backend/themes/)
+        return Path(__file__).resolve().parents[2] / "themes"
 
     @property
     def database_url(self) -> str:

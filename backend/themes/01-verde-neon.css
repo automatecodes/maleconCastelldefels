@@ -1,0 +1,19 @@
+/* ══════════════════════════════════════════════════════
+   VERDE NEÓN — Tema original · Club latino oscuro
+   Energía de sala, verde fosforescente sobre negro orgánico
+   ══════════════════════════════════════════════════════ */
+:root {
+  --bg:         #0A0E0B;
+  --surface:    #121814;
+  --surface-2:  #161d18;
+  --border:     #1E2622;
+  --green:      #2FE56B;
+  --green-hover:#25C75B;
+  --amber:      #F59E0B;
+  --text:       #F4F7F4;
+  --text-dim:   #9AA39C;
+  --glow: 0 0 0.5rem rgba(47,229,107,0.55), 0 0 1.5rem rgba(47,229,107,0.25);
+  --radius: 14px;
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}

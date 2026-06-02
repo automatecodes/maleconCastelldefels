@@ -1,0 +1,95 @@
+/* ══════════════════════════════════════════════════════
+   BLANCO ÉLITE — Editorial clean · Verde esmeralda profundo
+   Estudio premium de danza, espacio luminoso y sofisticado
+   ══════════════════════════════════════════════════════ */
+:root {
+  --bg:         #F6FAF7;
+  --surface:    #FFFFFF;
+  --surface-2:  #EEF5F0;
+  --border:     #C6DDD0;
+  --green:      #1A6B3C;
+  --green-hover:#125530;
+  --amber:      #B45309;
+  --text:       #0C1E13;
+  --text-dim:   #52706A;
+  --glow: 0 4px 24px rgba(26,107,60,0.14), 0 1px 6px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* Heading con línea acento */
+h2 { position: relative; display: inline-block; }
+h2::after {
+  content: ''; position: absolute; bottom: -6px; left: 0;
+  width: 2.5rem; height: 3px; border-radius: 2px;
+  background: var(--green);
+}
+
+/* Botones con sombra sólida (sin glow) */
+.btn-primary {
+  background: var(--green); color: #fff;
+  box-shadow: 4px 4px 0 rgba(26,107,60,0.25);
+}
+.btn-primary:hover {
+  background: var(--green-hover);
+  box-shadow: 6px 6px 0 rgba(26,107,60,0.30);
+  transform: translate(-2px, -2px);
+}
+.btn-ghost { border-color: var(--border); color: var(--text); }
+.btn-ghost:hover {
+  border-color: var(--green); color: var(--green);
+  background: rgba(26,107,60,0.06);
+  box-shadow: none;
+}
+
+/* Tarjetas con borde izquierdo animado */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: border-left-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.card:hover {
+  border-left-color: var(--green);
+  box-shadow: 0 8px 32px rgba(26,107,60,0.12);
+  transform: translateY(-3px);
+}
+
+/* Imágenes: blanco y negro → color en hover */
+.media-top img, .card img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: grayscale(60%) contrast(1.05);
+  transition: filter 0.5s ease;
+}
+.media-top:hover img, .card:hover img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: grayscale(0%) contrast(1);
+}
+
+/* Badge: borde sólido */
+.badge {
+  background: transparent;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+}
+
+/* Acento tipográfico */
+.accent { color: var(--green); }
+
+/* Inputs en blanco con borde verde al foco */
+input, select, textarea {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(26,107,60,0.12);
+}
+
+/* Hero overlay más suave en tema claro */
+.hero-overlay {
+  background: linear-gradient(180deg, rgba(12,30,19,0.45), rgba(12,30,19,0.88));
+}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getCourses, getSchedule } from '../api/client'
+import { getCourses, getSchedule, getEvents } from '../api/client'
 import Reveal from '../components/Reveal'
 import Modal from '../components/Modal'
 import { whatsappLink } from '../components/WhatsAppButton'
@@ -12,26 +13,217 @@ function addDays(date, n) {
 }
 function startOfWeek(date) {
   const d = new Date(date)
-  const dow = (d.getDay() + 6) % 7 // 0=Mon
-  d.setDate(d.getDate() - dow); d.setHours(0, 0, 0, 0); return d
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7)
+  d.setHours(0, 0, 0, 0)
+  return d
 }
-function fmt(date) {
+function toYMD(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+function fmtShort(date) {
   return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
 }
 
+// ── Celdas ────────────────────────────────────────────────────────────────────
+
+function SessionCell({ session, course, onClick }) {
+  const teacher = course.teachers?.[0]
+  const thumb = teacher?.photo_url || course.image_url
+  return (
+    <div className="sch-cell sch-cell--course" style={{ '--cell-color': course.calendar_color }} onClick={onClick}>
+      <div className="sch-cell-time">{session.start_time}–{session.end_time}</div>
+      <div className="sch-cell-body">
+        {thumb && (
+          <img className="sch-cell-thumb" src={thumb} alt={teacher?.full_name || course.name}
+            onError={(e) => { e.target.style.display = 'none' }} />
+        )}
+        <span className="sch-cell-name">{course.name}</span>
+      </div>
+    </div>
+  )
+}
+
+function EventCell({ event, compact = false, onClick }) {
+  return (
+    <div className={`sch-cell sch-cell--event${compact ? ' sch-cell--compact' : ''}`} onClick={onClick}>
+      {!compact && <div className="sch-cell-event-label">🎉 Evento</div>}
+      <div className="sch-cell-body">
+        {event.image_url && (
+          <img className="sch-cell-thumb sch-cell-thumb--event" src={event.image_url} alt={event.name}
+            onError={(e) => { e.target.style.display = 'none' }} />
+        )}
+        <span className="sch-cell-name">{event.name}</span>
+      </div>
+      {!compact && event.time_range && (
+        <div className="sch-cell-time" style={{ marginTop: '0.2rem' }}>{event.time_range}</div>
+      )}
+    </div>
+  )
+}
+
+// ── Modal de detalle ───────────────────────────────────────────────────────────
+
+function CourseModal({ session, course, onClose }) {
+  const { t } = useTranslation()
+  return (
+    <Modal onClose={onClose} large>
+      <div className="modal-content">
+        <div style={{ height: 4, background: course.calendar_color, borderRadius: 4, marginBottom: '1.25rem' }} />
+        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          {course.image_url && (
+            <img src={course.image_url} alt={course.name}
+              style={{ width: 110, height: 110, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }}
+              onError={(e) => { e.target.style.opacity = 0.2 }} />
+          )}
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <h3 style={{ marginBottom: '0.25rem' }}>{course.name}</h3>
+            <span className="badge" style={{ background: course.calendar_color + '33', color: course.calendar_color }}>
+              {course.level}
+            </span>
+            <p className="tag-dim" style={{ marginTop: '0.75rem', lineHeight: 1.5 }}>{course.description}</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginTop: '1.25rem' }}>
+          <div className="sch-info-item">
+            <span className="sch-info-label">📅 Día</span>
+            <span>{WEEKDAY_NAMES[session.weekday]}</span>
+          </div>
+          <div className="sch-info-item">
+            <span className="sch-info-label">🕐 Horario</span>
+            <span>{session.start_time}–{session.end_time}</span>
+          </div>
+          <div className="sch-info-item">
+            <span className="sch-info-label">📍 Sala</span>
+            <span>{session.room || course.room || '—'}</span>
+          </div>
+          <div className="sch-info-item">
+            <span className="sch-info-label">💶 Precio</span>
+            <span style={{ color: 'var(--green)', fontWeight: 700 }}>{Number(course.price)}€/mes</span>
+          </div>
+        </div>
+
+        {course.teachers?.length > 0 && (
+          <div style={{ marginTop: '1rem' }}>
+            <p className="sch-info-label" style={{ marginBottom: '0.5rem' }}>👤 Profesores</p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {course.teachers.map((tc) => (
+                <div key={tc.id} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  {tc.photo_url && (
+                    <img src={tc.photo_url} alt={tc.full_name}
+                      style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }}
+                      onError={(e) => { e.target.style.display = 'none' }} />
+                  )}
+                  <span style={{ fontSize: '0.9rem' }}>{tc.full_name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+          <a className="btn btn-primary"
+            href={whatsappLink(`Hola! Me interesa el curso ${course.name} (${WEEKDAY_NAMES[session.weekday]} ${session.start_time}).`)}
+            target="_blank" rel="noreferrer">
+            💬 Apuntarme por WhatsApp
+          </a>
+          <Link to="/contacto" className="btn btn-ghost" onClick={onClose}>
+            Formulario de contacto
+          </Link>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+function EventModal({ event, onClose }) {
+  return (
+    <Modal onClose={onClose} large>
+      <div className="modal-content">
+        {event.image_url && (
+          <img src={event.image_url} alt={event.name} className="modal-img"
+            style={{ borderRadius: 10, marginBottom: '1.25rem' }}
+            onError={(e) => { e.target.style.display = 'none' }} />
+        )}
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '1.2rem' }}>🎉</span>
+          <h3 style={{ margin: 0 }}>{event.name}</h3>
+        </div>
+        {event.subtitle && <p className="tag-dim" style={{ marginBottom: '0.75rem' }}>{event.subtitle}</p>}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '1rem' }}>
+          {event.date && (
+            <div className="sch-info-item">
+              <span className="sch-info-label">📅 Fecha</span>
+              <span>{event.date}</span>
+            </div>
+          )}
+          {event.time_range && (
+            <div className="sch-info-item">
+              <span className="sch-info-label">🕐 Horario</span>
+              <span>{event.time_range}</span>
+            </div>
+          )}
+          {event.location && (
+            <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
+              <span className="sch-info-label">📍 Lugar</span>
+              <span>{event.location}</span>
+            </div>
+          )}
+          {event.artists && (
+            <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
+              <span className="sch-info-label">🎵 Artistas</span>
+              <span>{event.artists}</span>
+            </div>
+          )}
+        </div>
+
+        {event.description && (
+          <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: '1rem' }}>{event.description}</p>
+        )}
+
+        {event.activities && (
+          <div style={{ marginBottom: '1rem' }}>
+            <p className="sch-info-label" style={{ marginBottom: '0.4rem' }}>📋 Programa</p>
+            {event.activities.split('\n').filter(Boolean).map((a, i) => (
+              <p key={i} className="tag-dim" style={{ margin: '0.2rem 0' }}>· {a}</p>
+            ))}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+          <a className="btn btn-primary"
+            href={whatsappLink(`Hola! Quiero información sobre el evento: ${event.name} (${event.date})`)}
+            target="_blank" rel="noreferrer">
+            💬 Más info por WhatsApp
+          </a>
+          <Link to="/eventos" className="btn btn-ghost" onClick={onClose}>
+            Ver todos los eventos
+          </Link>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+// ── Componente principal ───────────────────────────────────────────────────────
+
 export default function Schedule() {
   const { t } = useTranslation()
-  const [view, setView] = useState('semanal')   // semanal | 30 | 60
+  const [view, setView] = useState('semanal')
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [monthOffset, setMonthOffset] = useState(0)
   const [courses, setCourses] = useState([])
   const [sessions, setSessions] = useState([])
-  const [filters, setFilters] = useState({ course: '', teacher: '' })
-  const [selected, setSelected] = useState(null)
+  const [events, setEvents] = useState([])
+  const [filterCourse, setFilterCourse] = useState('')
+  const [filterTeacher, setFilterTeacher] = useState('')
+  const [selected, setSelected] = useState(null) // { type: 'course'|'event', ... }
 
   useEffect(() => {
     getCourses().then(setCourses).catch(() => {})
     getSchedule().then(setSessions).catch(() => {})
+    getEvents().then((evs) => setEvents(evs.filter((e) => e.date))).catch(() => {})
   }, [])
 
   const courseById = useMemo(() => Object.fromEntries(courses.map((c) => [c.id, c])), [courses])
@@ -42,107 +234,74 @@ export default function Schedule() {
     return m
   }, [courses])
 
+  // Mapa de eventos por fecha YMD
+  const eventsByDate = useMemo(() => {
+    const m = {}
+    events.forEach((e) => {
+      const key = e.date // ya viene como "YYYY-MM-DD"
+      if (!m[key]) m[key] = []
+      m[key].push(e)
+    })
+    return m
+  }, [events])
+
   const visibleSessions = sessions.filter((s) => {
     const c = courseById[s.course_id]
     if (!c) return false
-    if (filters.course && String(c.id) !== filters.course) return false
-    if (filters.teacher && !c.teachers?.some((tc) => String(tc.id) === filters.teacher)) return false
+    if (filterCourse && String(c.id) !== filterCourse) return false
+    if (filterTeacher && !c.teachers?.some((tc) => String(tc.id) === filterTeacher)) return false
     return true
   })
 
-  const openDetail = (session) => setSelected({ session, course: courseById[session.course_id] })
+  const openCourse = (session) => setSelected({ type: 'course', session, course: courseById[session.course_id] })
+  const openEvent = (event) => setSelected({ type: 'event', event })
 
-  // ── Celda con miniatura del profesor ───────────────────────────────────────
-  function SessionCell({ session, course }) {
-    const teacher = course.teachers?.[0]
-    return (
-      <div className="cal-cell" style={{ background: course.calendar_color }}
-        onClick={() => openDetail(session)}>
-        <div className="cell-time">{session.start_time}–{session.end_time}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' }}>
-          {teacher?.photo_url && (
-            <img src={teacher.photo_url} alt={teacher.full_name}
-              style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.4)' }}
-              onError={(e) => { e.target.style.display = 'none' }} />
-          )}
-          <span style={{ fontSize: '0.72rem', lineHeight: 1.2 }}>{course.name}</span>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Vista semanal ──────────────────────────────────────────────────────────
+  // ── Vista semanal ────────────────────────────────────────────────────────────
   function WeekView() {
     const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
     return (
       <>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem' }}
-            onClick={() => setWeekStart(addDays(weekStart, -7))}>‹ Ant.</button>
-          <span className="tag-dim" style={{ flex: 1, textAlign: 'center' }}>
-            {fmt(weekStart)} – {fmt(addDays(weekStart, 6))}
-          </span>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem' }}
-            onClick={() => setWeekStart(addDays(weekStart, 7))}>Sig. ›</button>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
+        <div className="sch-nav">
+          <button className="btn btn-ghost sch-nav-btn" onClick={() => setWeekStart(addDays(weekStart, -7))}>‹ Anterior</button>
+          <span className="tag-dim sch-nav-label">{fmtShort(weekStart)} – {fmtShort(addDays(weekStart, 6))}</span>
+          <button className="btn btn-ghost sch-nav-btn" onClick={() => setWeekStart(addDays(weekStart, 7))}>Siguiente ›</button>
+          <button className="btn btn-ghost sch-nav-btn sch-nav-today"
             onClick={() => setWeekStart(startOfWeek(new Date()))}>Hoy</button>
         </div>
         <div className="week-grid">
-          {days.map((day, idx) => (
-            <div key={idx} className="week-col">
-              <div className="week-day">{WEEKDAY_NAMES[idx].slice(0, 3)} {day.getDate()}</div>
-              {visibleSessions.filter((s) => s.weekday === idx)
-                .sort((a, b) => a.start_time.localeCompare(b.start_time))
-                .map((s) => <SessionCell key={s.id} session={s} course={courseById[s.course_id]} />)}
-            </div>
-          ))}
+          {days.map((day, idx) => {
+            const ymd = toYMD(day)
+            const dayEvents = eventsByDate[ymd] || []
+            const daySessions = visibleSessions.filter((s) => s.weekday === idx)
+              .sort((a, b) => a.start_time.localeCompare(b.start_time))
+            const isToday = ymd === toYMD(new Date())
+            return (
+              <div key={idx} className={`week-col${isToday ? ' week-col--today' : ''}`}>
+                <div className={`week-day${isToday ? ' week-day--today' : ''}`}>
+                  {WEEKDAY_NAMES[idx].slice(0, 3)} <strong>{day.getDate()}</strong>
+                </div>
+                {dayEvents.map((ev) => (
+                  <EventCell key={`ev-${ev.id}`} event={ev} onClick={() => openEvent(ev)} />
+                ))}
+                {daySessions.map((s) => (
+                  <SessionCell key={s.id} session={s} course={courseById[s.course_id]} onClick={() => openCourse(s)} />
+                ))}
+                {dayEvents.length === 0 && daySessions.length === 0 && (
+                  <div className="week-empty" />
+                )}
+              </div>
+            )
+          })}
         </div>
       </>
     )
   }
 
-  // ── Vista de N días (30 / 60) ─────────────────────────────────────────────
-  function DaysView({ days }) {
-    const start = startOfWeek(new Date())
-    const cells = Array.from({ length: days }, (_, i) => {
-      const d = addDays(start, i)
-      const weekday = (d.getDay() + 6) % 7
-      const daySessions = visibleSessions.filter((s) => s.weekday === weekday)
-      return { date: d, weekday, sessions: daySessions }
-    })
-    return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.5rem' }}>
-        {cells.map(({ date, sessions: daySess }, i) => (
-          <div key={i} className="month-cell">
-            <div className="month-num">{WEEKDAY_NAMES[(date.getDay() + 6) % 7].slice(0, 3)} {date.getDate()}</div>
-            {daySess.map((s) => {
-              const c = courseById[s.course_id]
-              const teacher = c.teachers?.[0]
-              return (
-                <div key={s.id} className="month-dot" style={{ background: c.calendar_color }}
-                  onClick={() => openDetail(s)} title={c.name}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    {teacher?.photo_url && (
-                      <img src={teacher.photo_url} alt=""
-                        style={{ width: 14, height: 14, borderRadius: '50%', objectFit: 'cover' }}
-                        onError={(e) => { e.target.style.display = 'none' }} />
-                    )}
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  // ── Vista mensual ──────────────────────────────────────────────────────────
+  // ── Vista mensual ────────────────────────────────────────────────────────────
   function MonthView() {
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = today.getMonth() + monthOffset
+    const base = new Date()
+    const year = base.getFullYear()
+    const month = base.getMonth() + monthOffset
     const firstDay = new Date(year, month, 1)
     const startOffset = (firstDay.getDay() + 6) % 7
     const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -150,17 +309,15 @@ export default function Schedule() {
     for (let i = 0; i < startOffset; i++) cells.push(null)
     for (let d = 1; d <= daysInMonth; d++) cells.push(d)
     const label = new Date(year, month, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+    const todayYMD = toYMD(new Date())
 
     return (
       <>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem' }}
-            onClick={() => setMonthOffset(monthOffset - 1)}>‹</button>
-          <span className="tag-dim" style={{ flex: 1, textAlign: 'center', textTransform: 'capitalize' }}>{label}</span>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem' }}
-            onClick={() => setMonthOffset(monthOffset + 1)}>›</button>
-          <button className="btn btn-ghost" style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
-            onClick={() => setMonthOffset(0)}>Hoy</button>
+        <div className="sch-nav">
+          <button className="btn btn-ghost sch-nav-btn" onClick={() => setMonthOffset(monthOffset - 1)}>‹</button>
+          <span className="tag-dim sch-nav-label" style={{ textTransform: 'capitalize' }}>{label}</span>
+          <button className="btn btn-ghost sch-nav-btn" onClick={() => setMonthOffset(monthOffset + 1)}>›</button>
+          <button className="btn btn-ghost sch-nav-btn sch-nav-today" onClick={() => setMonthOffset(0)}>Hoy</button>
         </div>
         <div className="month-grid" style={{ marginBottom: '0.4rem' }}>
           {WEEKDAY_NAMES.map((d) => <div key={d} className="week-day">{d.slice(0, 3)}</div>)}
@@ -168,24 +325,42 @@ export default function Schedule() {
         <div className="month-grid">
           {cells.map((d, idx) => {
             if (d === null) return <div key={idx} />
+            const ymd = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
             const weekday = (new Date(year, month, d).getDay() + 6) % 7
             const daySessions = visibleSessions.filter((s) => s.weekday === weekday)
+            const dayEvents = eventsByDate[ymd] || []
+            const isToday = ymd === todayYMD
             return (
-              <div key={idx} className="month-cell">
-                <div className="month-num">{d}</div>
+              <div key={idx} className={`month-cell${isToday ? ' month-cell--today' : ''}`}>
+                <div className={`month-num${isToday ? ' month-num--today' : ''}`}>{d}</div>
+                {dayEvents.map((ev) => (
+                  <div key={`ev-${ev.id}`} className="month-dot month-dot--event"
+                    onClick={() => openEvent(ev)} title={ev.name}>
+                    <div className="month-dot-inner">
+                      {ev.image_url
+                        ? <img src={ev.image_url} alt="" className="month-dot-thumb"
+                            onError={(e) => { e.target.style.display = 'none' }} />
+                        : <span style={{ fontSize: '0.65rem' }}>🎉</span>
+                      }
+                      <span>{ev.name}</span>
+                    </div>
+                  </div>
+                ))}
                 {daySessions.map((s) => {
                   const c = courseById[s.course_id]
                   const teacher = c.teachers?.[0]
+                  const thumb = teacher?.photo_url || c.image_url
                   return (
-                    <div key={s.id} className="month-dot" style={{ background: c.calendar_color }}
-                      onClick={() => openDetail(s)} title={c.name}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {teacher?.photo_url && (
-                          <img src={teacher.photo_url} alt=""
-                            style={{ width: 14, height: 14, borderRadius: '50%', objectFit: 'cover' }}
-                            onError={(e) => { e.target.style.display = 'none' }} />
-                        )}
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                    <div key={s.id} className="month-dot"
+                      style={{ background: c.calendar_color }}
+                      onClick={() => openCourse(s)} title={c.name}>
+                      <div className="month-dot-inner">
+                        {thumb
+                          ? <img src={thumb} alt="" className="month-dot-thumb month-dot-thumb--round"
+                              onError={(e) => { e.target.style.display = 'none' }} />
+                          : <span style={{ width: 14 }} />
+                        }
+                        <span>{c.name}</span>
                       </div>
                     </div>
                   )
@@ -207,84 +382,82 @@ export default function Schedule() {
         <p className="section-sub">{t('schedule.subtitle')}</p>
       </Reveal>
 
+      {/* Tabs de vista */}
       <div className="cal-tabs">
-        {[['semanal', 'Semana'], ['30', '30 días'], ['60', '60 días'], ['monthly', 'Mes']].map(([v, label]) => (
-          <button key={v} className={view === v ? 'cal-tab active' : 'cal-tab'} onClick={() => setView(v)}>{label}</button>
-        ))}
+        <button className={view === 'semanal' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('semanal')}>
+          Semana
+        </button>
+        <button className={view === 'monthly' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('monthly')}>
+          Mes
+        </button>
       </div>
 
-      {/* Filtros: solo curso y profesor, sin nivel */}
+      {/* Leyenda */}
+      <div className="sch-legend">
+        <span className="sch-legend-item sch-legend-item--course">● Clases semanales</span>
+        <span className="sch-legend-item sch-legend-item--event">🎉 Eventos</span>
+      </div>
+
+      {/* Filtros */}
       <div className="cal-filters">
-        <select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })}>
+        <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
           <option value="">Todos los cursos</option>
           {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <select value={filters.teacher} onChange={(e) => setFilters({ ...filters, teacher: e.target.value })}>
+        <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
           <option value="">Todos los profesores</option>
           {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
         </select>
       </div>
 
       {view === 'semanal' && <WeekView />}
-      {view === '30' && <DaysView days={30} />}
-      {view === '60' && <DaysView days={60} />}
       {view === 'monthly' && <MonthView />}
 
       {/* Tabla de precios */}
-      <Reveal className="section">
-        <h3 style={{ marginTop: '2rem' }}>{t('schedule.prices')}</h3>
-        <div className="price-table">
-          <table>
-            <thead>
-              <tr><th>Curso</th><th>{t('schedule.monthlyFee')}</th><th>{t('schedule.trialClass')}</th></tr>
-            </thead>
-            <tbody>
-              {courses.map((c) => (
-                <tr key={c.id}>
-                  <td><span style={{ color: c.calendar_color }}>●</span> {c.name} · <span className="tag-dim">{c.level}</span></td>
-                  <td>{Number(c.price)}€{t('common.perMonth')}</td>
-                  <td>{Number(c.trial_price) > 0 ? `${Number(c.trial_price)}€` : '—'}</td>
+      <Reveal>
+        <div className="sch-prices">
+          <h3>{t('schedule.prices')}</h3>
+          <div className="price-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Curso</th>
+                  <th>Profesores</th>
+                  <th>{t('schedule.monthlyFee')}</th>
+                  <th>Prueba</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {courses.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <span style={{ color: c.calendar_color, marginRight: '0.4rem' }}>●</span>
+                      <strong>{c.name}</strong>
+                      <span className="tag-dim" style={{ marginLeft: '0.4rem', fontSize: '0.85rem' }}>{c.level}</span>
+                    </td>
+                    <td className="tag-dim" style={{ fontSize: '0.85rem' }}>
+                      {c.teachers?.map((tc) => tc.full_name).join(', ') || '—'}
+                    </td>
+                    <td style={{ color: 'var(--green)', fontWeight: 700 }}>
+                      {Number(c.price)}€<span className="tag-dim">/mes</span>
+                    </td>
+                    <td className="tag-dim">
+                      {Number(c.trial_price) > 0 ? `${Number(c.trial_price)}€` : 'Gratis'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </Reveal>
 
-      {selected && (
-        <Modal onClose={() => setSelected(null)} large>
-          <div className="modal-content">
-            <div className="color-bar" style={{ background: selected.course.calendar_color, marginBottom: '1rem' }} />
-            <img className="modal-img" src={selected.course.image_url} alt={selected.course.name}
-              onError={(e) => { e.target.style.opacity = 0.15 }} />
-            <h3>{selected.course.name} · {selected.course.level}</h3>
-            <p className="tag-dim" style={{ margin: '0.5rem 0' }}>{selected.course.description}</p>
-            <ul className="tag-dim" style={{ listStyle: 'none' }}>
-              {selected.course.teachers?.length > 0 && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                  <strong>{t('common.teachers')}:</strong>
-                  {selected.course.teachers.map((tc) => (
-                    <span key={tc.id} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      {tc.photo_url && (
-                        <img src={tc.photo_url} alt={tc.full_name}
-                          style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}
-                          onError={(e) => { e.target.style.display = 'none' }} />
-                      )}
-                      {tc.full_name}
-                    </span>
-                  ))}
-                </li>
-              )}
-              <li><strong>{WEEKDAY_NAMES[selected.session.weekday]}:</strong> {selected.session.start_time}–{selected.session.end_time}</li>
-              <li><strong>{t('common.room')}:</strong> {selected.session.room || selected.course.room}</li>
-              <li><strong>{t('common.duration')}:</strong> {selected.course.duration}</li>
-              <li><strong>{t('common.price')}:</strong> {Number(selected.course.price)}€{t('common.perMonth')}</li>
-            </ul>
-            <a className="btn btn-primary" style={{ marginTop: '1rem' }}
-              href={whatsappLink(`Hola, quiero apuntarme a ${selected.course.name}`)}
-              target="_blank" rel="noreferrer">{t('common.writeUs')}</a>
-          </div>
-        </Modal>
+      {/* Modales */}
+      {selected?.type === 'course' && (
+        <CourseModal session={selected.session} course={selected.course} onClose={() => setSelected(null)} />
+      )}
+      {selected?.type === 'event' && (
+        <EventModal event={selected.event} onClose={() => setSelected(null)} />
       )}
     </div>
   )

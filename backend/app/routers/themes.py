@@ -32,6 +32,12 @@ class CssVars(BaseModel):
     vars: dict[str, str] = {}
 
 
+class ThemeFromURL(BaseModel):
+    url: str
+    name: str = "tema-generado"
+    apply: bool = True   # aplicar automáticamente tras generar
+
+
 def _list_css_files() -> list[str]:
     base = settings.themes_path
     if not base.is_dir():
@@ -122,6 +128,32 @@ def import_theme(payload: CssVars, db: Session = Depends(get_db)):
             db.add(SiteSetting(key=key, value=value))
     db.commit()
     return {"imported": len(payload.vars)}
+
+
+@router.post("/from-url")
+def theme_from_url(payload: ThemeFromURL, db: Session = Depends(get_db)):
+    """Genera un tema CSS analizando la URL indicada con Claude."""
+    from app.services.theme_inspector import generate_theme_from_url
+    try:
+        result = generate_theme_from_url(payload.url, payload.name)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(502, f"Error al inspeccionar la URL: {e}")
+
+    if payload.apply:
+        row = db.get(SiteSetting, ACTIVE_THEME_KEY)
+        if row:
+            row.value = result["filename"]
+        else:
+            db.add(SiteSetting(key=ACTIVE_THEME_KEY, value=result["filename"]))
+        db.commit()
+
+    return {
+        "filename": result["filename"],
+        "applied": payload.apply,
+        "css_preview": result["css"][:500],
+    }
 
 
 @public_router.get("/theme")

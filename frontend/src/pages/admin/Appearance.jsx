@@ -37,11 +37,46 @@ export default function Appearance() {
   const importRef = useRef(null)
   const [importMsg, setImportMsg] = useState('')
 
+  // URL → tema
+  const [urlInput, setUrlInput] = useState('')
+  const [urlName, setUrlName] = useState('')
+  const [urlApply, setUrlApply] = useState(true)
+  const [urlGenerating, setUrlGenerating] = useState(false)
+  const [urlMsg, setUrlMsg] = useState('')
+  const [urlPreview, setUrlPreview] = useState('')
+
+  const refreshThemes = () =>
+    adminGetThemes().then((d) => { setThemes(d.themes); setActive(d.active) }).catch(() => {})
+
   useEffect(() => {
     adminGetThemes()
       .then((d) => { setThemes(d.themes); setActive(d.active) })
       .catch(() => setMsg(t('appearance.error')))
   }, [t])
+
+  const generateFromUrl = async () => {
+    if (!urlInput.trim()) return
+    setUrlGenerating(true)
+    setUrlMsg('')
+    setUrlPreview('')
+    try {
+      const res = await fetch('/api/admin/themes/from-url', {
+        method: 'POST',
+        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlInput.trim(), name: urlName.trim() || 'tema-generado', apply: urlApply }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Error desconocido')
+      setUrlMsg(`✅ Tema "${data.filename}" generado${data.applied ? ' y aplicado' : ''}`)
+      setUrlPreview(data.css_preview)
+      await refreshThemes()
+      if (data.applied) { setActive(data.filename); reloadActiveTheme() }
+    } catch (e) {
+      setUrlMsg(`❌ ${e.message}`)
+    } finally {
+      setUrlGenerating(false)
+    }
+  }
 
   useEffect(() => {
     adminGetVideoSettings().then(setVideoSt).catch(() => {})
@@ -288,6 +323,86 @@ export default function Appearance() {
           </button>
           {videoMsg && <span className="tag-dim">{videoMsg}</span>}
         </div>
+      </div>
+
+      {/* Generar tema desde URL */}
+      <div className="card card-body" style={{ maxWidth: 560, marginBottom: '1.5rem' }}>
+        <h3 style={{ marginBottom: '0.35rem' }}>✨ Generar tema desde URL</h3>
+        <p className="tag-dim" style={{ marginBottom: '1.25rem', fontSize: '0.88rem' }}>
+          Claude analiza los estilos, colores y tipografía del sitio indicado y crea un nuevo tema adaptado a elMalecón.
+        </p>
+
+        <div className="field">
+          <label>URL del sitio a inspeccionar</label>
+          <input
+            type="url"
+            placeholder="https://ejemplo.com"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            disabled={urlGenerating}
+          />
+        </div>
+
+        <div className="field">
+          <label>Nombre del nuevo tema</label>
+          <input
+            type="text"
+            placeholder="mi-tema-nuevo"
+            value={urlName}
+            onChange={(e) => setUrlName(e.target.value)}
+            disabled={urlGenerating}
+          />
+          <p className="tag-dim" style={{ fontSize: '0.78rem', marginTop: '0.25rem' }}>
+            Se guardará como <code>{(urlName.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'tema-generado')}.css</code>
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+          <input
+            type="checkbox"
+            id="url-apply"
+            checked={urlApply}
+            onChange={(e) => setUrlApply(e.target.checked)}
+            style={{ width: 'auto', accentColor: 'var(--green)' }}
+          />
+          <label htmlFor="url-apply" style={{ margin: 0, cursor: 'pointer' }}>
+            Aplicar automáticamente al terminar
+          </label>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-primary"
+            onClick={generateFromUrl}
+            disabled={urlGenerating || !urlInput.trim()}
+          >
+            {urlGenerating
+              ? <><span style={{ display: 'inline-block', marginRight: '0.5rem' }}>⟳</span> Analizando…</>
+              : '✨ Generar tema'}
+          </button>
+          {urlMsg && (
+            <span style={{ fontSize: '0.88rem', color: urlMsg.startsWith('✅') ? 'var(--green)' : '#ef4444' }}>
+              {urlMsg}
+            </span>
+          )}
+        </div>
+
+        {urlGenerating && (
+          <p className="tag-dim" style={{ marginTop: '0.75rem', fontSize: '0.82rem' }}>
+            Claude está inspeccionando el sitio y generando el CSS… esto puede tardar 20-30 segundos.
+          </p>
+        )}
+
+        {urlPreview && (
+          <div style={{ marginTop: '1rem' }}>
+            <p className="tag-dim" style={{ fontSize: '0.78rem', marginBottom: '0.35rem' }}>Vista previa del CSS generado:</p>
+            <pre style={{
+              background: 'var(--surface-2)', padding: '0.75rem', borderRadius: 8,
+              fontSize: '0.72rem', overflow: 'auto', maxHeight: 160,
+              border: '1px solid var(--border)', color: 'var(--text-dim)',
+            }}>{urlPreview}…</pre>
+          </div>
+        )}
       </div>
     </div>
   )

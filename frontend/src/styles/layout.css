@@ -272,7 +272,7 @@
 }
 .sch-cell:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .sch-cell--event {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  background: linear-gradient(135deg, #F02D5E 0%, #C01D4A 100%) !important;
   color: #fff;
   border-left: 3px solid rgba(255,255,255,0.35);
 }
@@ -307,7 +307,7 @@
 }
 .month-dot:hover { filter: brightness(1.1); }
 .month-dot--event {
-  background: linear-gradient(90deg, #F59E0B, #D97706) !important;
+  background: linear-gradient(90deg, #F02D5E, #C01D4A) !important;
   color: #fff; border-radius: 6px;
 }
 .month-dot-inner { display: flex; align-items: center; gap: 0.3rem; }
@@ -331,7 +331,7 @@
   display: flex; flex-direction: column;
   border-right: 3px solid var(--accent, var(--green));
 }
-.modal-split-img--event { border-right-color: #F59E0B; }
+.modal-split-img--event { border-right-color: #F02D5E; }
 .modal-split-photo {
   width: 100%; flex: 1; object-fit: cover; display: block;
   min-height: 180px;
@@ -361,7 +361,7 @@
   height: 3px; border-radius: 3px; margin-bottom: 0.75rem;
   background: var(--green);
 }
-.modal-split-accent--event { background: #F59E0B; }
+.modal-split-accent--event { background: #F02D5E; }
 .modal-split-title { margin: 0 0 0.5rem; font-size: 1.3rem; line-height: 1.2; }
 .modal-split-desc { color: var(--text-dim); line-height: 1.5; font-size: 0.92rem; margin: 0.4rem 0 0.75rem; }
 .modal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
@@ -372,7 +372,7 @@
 @media (max-width: 600px) {
   .modal-split { flex-direction: column; }
   .modal-split-img { width: 100%; height: 180px; border-radius: 12px 12px 0 0; border-right: none; border-bottom: 3px solid var(--accent, var(--green)); }
-  .modal-split-img--event { border-bottom-color: #F59E0B; }
+  .modal-split-img--event { border-bottom-color: #F02D5E; }
   .modal-split-teachers { flex-direction: row; flex-wrap: wrap; }
   .modal-info-grid { grid-template-columns: 1fr 1fr; }
   .cal-bar { flex-direction: column; align-items: flex-start; }

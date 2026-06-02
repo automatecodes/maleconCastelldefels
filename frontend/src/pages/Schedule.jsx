@@ -161,7 +161,7 @@ function EventModal({ event, onClose }) {
             <h3 className="modal-split-title" style={{ margin: 0 }}>{event.name}</h3>
           </div>
           {event.subtitle && (
-            <p className="modal-split-desc" style={{ color: '#F59E0B' }}>{event.subtitle}</p>
+            <p className="modal-split-desc" style={{ color: '#F02D5E' }}>{event.subtitle}</p>
           )}
 
           <div className="modal-info-grid">

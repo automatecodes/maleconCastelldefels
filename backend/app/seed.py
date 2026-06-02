@@ -72,12 +72,21 @@ def run():
             teacher_map[slug] = t.id
 
         # ── Cursos ───────────────────────────────────────────────────────────
+        # ── Paleta pastel para cursos (20 colores, texto oscuro #07160c) ───────
+        # Usar en orden para nuevos cursos; el amarillo-lima (#F0F4A8) es el 20.
+        # CURSO_PALETTE = [
+        #   "#A8E8C8","#A0D8F0","#F8B8C8","#C8B0F8","#FFD0A8","#F0F8A0",
+        #   "#A8D0F8","#F8C8A0","#B8F0E0","#F0A8D8","#A8C0F8","#F8E8A0",
+        #   "#C0F0C8","#F0B8A8","#B0C8F8","#F8D0C0","#A0F0D8","#E8C8F8",
+        #   "#F8F0A8","#C8E8A0",
+        # ]
+
         courses_data = [
             {
                 "slug": "salsa-inicio", "name": "Salsa Inicio",
                 "level": "Inicio", "style": "Salsa Cubana",
                 "room": "Sala 1", "capacity": 20, "price": "33", "trial_price": "12.5",
-                "status": "abierto", "featured": True, "color": "#2FE56B",
+                "status": "abierto", "featured": True, "color": "#A8E8C8",  # menta pastel
                 "description": "Aprende los pasos básicos de la Salsa Cubana desde cero. Matrícula gratis. Jueves 19h-21h.",
                 "teacher_slugs": ["jorge"],
                 "sessions": [(3, "19:00", "21:00", "Sala 1")],
@@ -86,7 +95,7 @@ def run():
                 "slug": "bachata-inicio", "name": "Bachata Inicio",
                 "level": "Inicio", "style": "Bachata",
                 "room": "Sala 2", "capacity": 20, "price": "33", "trial_price": "12.5",
-                "status": "abierto", "featured": True, "color": "#F59E0B",
+                "status": "abierto", "featured": True, "color": "#A8D0F8",  # azul cielo pastel
                 "description": "Introducción a la Bachata: bases, conexión y sensualidad. Lunes 18h-20h.",
                 "teacher_slugs": ["monica"],
                 "sessions": [(0, "18:00", "20:00", "Sala 2")],
@@ -95,7 +104,7 @@ def run():
                 "slug": "bachata-estilo-chica", "name": "Estilo Chica de Bachata",
                 "level": "Inicio", "style": "Bachata / Lady Style",
                 "room": "Sala 2", "capacity": 16, "price": "33", "trial_price": "0",
-                "status": "abierto", "featured": False, "color": "#EC4899",
+                "status": "abierto", "featured": False, "color": "#F8B8C8",  # rosa chicle pastel
                 "description": "Técnica femenina de Bachata: estilo, elegancia y movimiento. Miércoles 18h-19h. Con Marta.",
                 "teacher_slugs": ["marta"],
                 "sessions": [(2, "18:00", "19:00", "Sala 2")],
@@ -104,7 +113,7 @@ def run():
                 "slug": "merengue-inicio", "name": "Merengue Inicio",
                 "level": "Inicio", "style": "Merengue",
                 "room": "Sala 1", "capacity": 20, "price": "33", "trial_price": "0",
-                "status": "abierto", "featured": False, "color": "#8B5CF6",
+                "status": "abierto", "featured": False, "color": "#C8B0F8",  # violeta pastel
                 "description": "Merengue Intensivo: ritmo, energía y diversión. Martes 18:30h-19:30h.",
                 "teacher_slugs": ["frederic"],
                 "sessions": [(1, "18:30", "19:30", "Sala 1")],
@@ -113,7 +122,7 @@ def run():
                 "slug": "salsa-rumba-son", "name": "Salsa con Rumba y Son Cubano",
                 "level": "Intermedio", "style": "Salsa / Rumba / Son",
                 "room": "Sala 1", "capacity": 18, "price": "33", "trial_price": "0",
-                "status": "abierto", "featured": True, "color": "#EF4444",
+                "status": "abierto", "featured": True, "color": "#FFD0A8",  # melocotón pastel
                 "description": "Nivel intermedio: fusión de Salsa, Rumba y Son Cubano. Miércoles 20h-22h. Con Yasmany & Aroa.",
                 "teacher_slugs": ["yasmany", "aroa"],
                 "sessions": [(2, "20:00", "22:00", "Sala 1")],
@@ -122,7 +131,7 @@ def run():
                 "slug": "cha-cha-boogaloo", "name": "Cha-Cha Boogaloo",
                 "level": "Inicio", "style": "Cha-Cha / Boogaloo",
                 "room": "Sala 1", "capacity": 20, "price": "33", "trial_price": "0",
-                "status": "abierto", "featured": False, "color": "#F97316",
+                "status": "abierto", "featured": False, "color": "#F0F8A0",  # lima-amarillo pastel
                 "description": "Ritmos clásicos latinos: Cha-Cha y Boogaloo. Viernes 18h-19h. Con Mario Layunta.",
                 "teacher_slugs": ["mario-layunta"],
                 "sessions": [(4, "18:00", "19:00", "Sala 1")],

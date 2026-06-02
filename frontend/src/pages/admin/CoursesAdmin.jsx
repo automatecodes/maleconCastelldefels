@@ -7,6 +7,30 @@ const API = '/api/admin'
 const token = () => localStorage.getItem('token')
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` })
 
+// Paleta pastel para calendarios (20 colores, texto oscuro sobre fondo pastel)
+const COURSE_PALETTE = [
+  '#A8E8C8', // menta
+  '#A8D0F8', // azul cielo
+  '#F8B8C8', // rosa chicle
+  '#C8B0F8', // violeta
+  '#FFD0A8', // melocotón
+  '#F0F8A0', // lima-amarillo
+  '#A0D8F0', // aqua
+  '#F8C8A0', // albaricoque
+  '#B8F0E0', // turquesa
+  '#F0A8D8', // lila
+  '#A8C0F8', // azul lavanda
+  '#F8E8A0', // mantequilla
+  '#C0F0C8', // verde pálido
+  '#F0B8A8', // salmón
+  '#B0C8F8', // periwinkle
+  '#F8D0C0', // coral pálido
+  '#A0F0D8', // jade
+  '#E8C8F8', // malva
+  '#F8F0A8', // limón
+  '#C8E8A0', // verde lima
+]
+
 const LEVELS = ['Inicio', 'Intermedio', 'Avanzado']
 const STATUSES = ['abierto', 'próxima apertura', 'cerrado']
 
@@ -294,7 +318,26 @@ export default function CoursesAdmin() {
               </div>
               <div className="field">
                 <label>Color calendario</label>
-                <input type="color" value={form.calendar_color} onChange={(e) => onChange('calendar_color', e.target.value)} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.25rem' }}>
+                  {COURSE_PALETTE.map((col) => (
+                    <button key={col} type="button"
+                      onClick={() => onChange('calendar_color', col)}
+                      title={col}
+                      style={{
+                        width: 28, height: 28, borderRadius: '50%', background: col,
+                        border: form.calendar_color === col ? '3px solid var(--green)' : '2px solid var(--border)',
+                        cursor: 'pointer', flexShrink: 0, transition: 'border 0.15s',
+                      }} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.4rem' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: form.calendar_color, border: '1px solid var(--border)', flexShrink: 0 }} />
+                  <input type="color" value={form.calendar_color}
+                    onChange={(e) => onChange('calendar_color', e.target.value)}
+                    style={{ width: 36, height: 28, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}
+                    title="Color personalizado" />
+                  <span className="tag-dim" style={{ fontSize: '0.8rem' }}>{form.calendar_color}</span>
+                </div>
               </div>
               <div className="field">
                 <label>Sala</label>

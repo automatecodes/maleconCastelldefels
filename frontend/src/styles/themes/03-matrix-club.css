@@ -1,0 +1,143 @@
+/* ══════════════════════════════════════════════════════
+   MATRIX CLUB — Negro absoluto · Verde terminal
+   Estética cyberpunk-club, intensidad máxima, efectos digitales
+   ══════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg:         #000000;
+  --surface:    #060606;
+  --surface-2:  #0A0A0A;
+  --border:     #0D2200;
+  --green:      #00FF41;
+  --green-hover:#00DD38;
+  --amber:      #00E5FF;
+  --text:       #AAFFAA;
+  --text-dim:   #2E7A44;
+  --glow: 0 0 6px rgba(0,255,65,0.9), 0 0 24px rgba(0,255,65,0.4), 0 0 48px rgba(0,255,65,0.15);
+  --radius: 4px;
+  --font-head: 'Share Tech Mono', 'Courier New', monospace;
+  --font-body:  'Share Tech Mono', 'Courier New', monospace;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* Scanlines en el body */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+/* Heading: pulso de glow continuo */
+@keyframes matrix-pulse {
+  0%, 100% { text-shadow: 0 0 6px var(--green), 0 0 20px rgba(0,255,65,0.4); }
+  50%       { text-shadow: 0 0 12px var(--green), 0 0 40px rgba(0,255,65,0.7), 0 0 60px rgba(0,255,65,0.2); }
+}
+h1, h2 {
+  color: var(--green);
+  animation: matrix-pulse 3s ease-in-out infinite;
+  letter-spacing: 0.04em;
+}
+
+/* Acento con gradiente neon */
+.accent {
+  background: linear-gradient(90deg, #00FF41, #00E5FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: none;
+  text-shadow: none;
+}
+
+/* Botones: borde brillante, fondo negro */
+.btn-primary {
+  background: transparent;
+  color: var(--green);
+  border: 1px solid var(--green);
+  box-shadow: 0 0 8px rgba(0,255,65,0.5), inset 0 0 8px rgba(0,255,65,0.05);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.btn-primary:hover {
+  background: var(--green);
+  color: #000;
+  box-shadow: var(--glow);
+  transform: none;
+}
+.btn-ghost {
+  border-color: var(--border);
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+.btn-ghost:hover {
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 6px rgba(0,255,65,0.3);
+}
+
+/* Tarjetas: bordes neon con efecto terminal */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card:hover {
+  border-color: rgba(0,255,65,0.4);
+  box-shadow: 0 0 20px rgba(0,255,65,0.15), inset 0 0 20px rgba(0,255,65,0.02);
+  transform: none;
+}
+.card:hover::before { opacity: 1; }
+
+/* Imágenes: tinte verde + scanlines en hover */
+.media-top img, .card img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: saturate(0.4) hue-rotate(80deg) brightness(0.85);
+  transition: filter 0.4s;
+}
+.media-top:hover img, .card:hover img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: saturate(0.8) hue-rotate(100deg) brightness(1.05);
+}
+
+/* Badge terminal */
+.badge {
+  background: rgba(0,255,65,0.08);
+  border: 1px solid rgba(0,255,65,0.4);
+  color: var(--green);
+  border-radius: 0;
+  font-family: var(--font-head);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+}
+
+/* Inputs: estilo consola */
+input, select, textarea {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--green);
+  font-family: var(--font-head);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 8px rgba(0,255,65,0.3);
+}
+
+/* Cursor de texto parpadeante */
+@keyframes cursor-blink { 50% { border-color: transparent; } }

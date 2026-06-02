@@ -1,0 +1,130 @@
+/* ══════════════════════════════════════════════════════
+   NOIR MINT — Negro intenso · Menta fresca + blanco puro
+   Fotografía de moda + danza, alto contraste editorial
+   ══════════════════════════════════════════════════════ */
+:root {
+  --bg:         #0C0C0C;
+  --surface:    #141414;
+  --surface-2:  #1A1A1A;
+  --border:     #2A2A2A;
+  --green:      #69F0AE;        /* menta fresca */
+  --green-hover:#40E08A;
+  --amber:      #FFFFFF;        /* blanco como tercer acento */
+  --text:       #FFFFFF;
+  --text-dim:   #757575;
+  --glow: 0 0 4px rgba(105,240,174,0.6), 0 0 16px rgba(105,240,174,0.2);
+  --radius: 0px;                /* ángulos rectos, editorial */
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* Heading en blanco puro, sin adorno */
+h1, h2, h3 { color: #fff; letter-spacing: -0.03em; }
+
+/* Acento: bloque de color mint como highlight */
+.accent {
+  color: var(--green);
+  -webkit-text-fill-color: var(--green);
+  text-decoration: underline;
+  text-decoration-color: rgba(105,240,174,0.4);
+  text-underline-offset: 4px;
+}
+
+/* Separador tipográfico en secciones */
+.section-title { border-left: 3px solid var(--green); padding-left: 0.75rem; }
+
+/* Botones: maximalismo editorial */
+.btn-primary {
+  background: #fff;
+  color: #0C0C0C;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+.btn-primary:hover {
+  background: var(--green);
+  color: #0C0C0C;
+  box-shadow: 0 0 20px rgba(105,240,174,0.25);
+  transform: none;
+}
+.btn-ghost {
+  border: 1px solid #fff;
+  color: #fff;
+  background: transparent;
+  border-radius: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+.btn-ghost:hover {
+  background: #fff;
+  color: #0C0C0C;
+  border-color: #fff;
+  box-shadow: none;
+}
+
+/* Tarjetas: maximalismo editorial con borde blanco */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  transition: all 0.2s;
+}
+.card:hover {
+  border-color: #fff;
+  box-shadow: none;
+  transform: none;
+}
+.card:hover .card-body { border-left: 3px solid var(--green); }
+.card-body { border-left: 3px solid transparent; transition: border-left-color 0.2s; }
+
+/* Imágenes: blanco y negro total → color en hover */
+.media-top img, .card img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: grayscale(100%) contrast(1.1);
+  transition: filter 0.5s ease;
+}
+.media-top:hover img, .card:hover img:not(.lang-flag):not(.sch-cell-thumb) {
+  filter: grayscale(0%) contrast(1);
+}
+
+/* Badge editorial */
+.badge {
+  background: transparent;
+  border: 1px solid rgba(105,240,174,0.5);
+  color: var(--green);
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+}
+
+/* Inputs editoriales */
+input, select, textarea {
+  background: #0C0C0C;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: #fff;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid var(--border);
+  padding-left: 0;
+}
+input:focus, select:focus, textarea:focus {
+  border-bottom-color: var(--green);
+  box-shadow: none;
+  outline: none;
+}
+
+/* Cursor de sección */
+.reveal { transform: translateX(-16px); }
+.reveal.is-visible { transform: none; }
+
+/* Tabla editorial */
+th { color: var(--green); border-bottom: 2px solid var(--green); }

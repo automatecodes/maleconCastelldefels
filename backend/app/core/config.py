@@ -74,8 +74,8 @@ class Settings(BaseSettings):
     def themes_path(self) -> Path:
         if self.THEMES_DIR:
             return Path(self.THEMES_DIR)
-        # backend/app/core/config.py -> raíz del repo (parents[3]) -> frontend/src/styles
-        return Path(__file__).resolve().parents[3] / "frontend" / "src" / "styles"
+        # backend/app/core/config.py -> raíz del repo (parents[3]) -> frontend/src/styles/themes
+        return Path(__file__).resolve().parents[3] / "frontend" / "src" / "styles" / "themes"
 
     @property
     def database_url(self) -> str:

@@ -61,145 +61,159 @@ function EventCell({ event, compact = false, onClick }) {
   )
 }
 
-// ── Modal de detalle ───────────────────────────────────────────────────────────
+// ── Modal de curso ─────────────────────────────────────────────────────────────
 
 function CourseModal({ session, course, onClose }) {
   const { t } = useTranslation()
   return (
     <Modal onClose={onClose} large>
-      <div className="modal-content">
-        <div style={{ height: 4, background: course.calendar_color, borderRadius: 4, marginBottom: '1.25rem' }} />
-        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          {course.image_url && (
-            <img src={course.image_url} alt={course.name}
-              style={{ width: 110, height: 110, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }}
-              onError={(e) => { e.target.style.opacity = 0.2 }} />
+      <div className="modal-split">
+        {/* Columna izquierda — imagen + profesores */}
+        <div className="modal-split-img" style={{ '--accent': course.calendar_color }}>
+          {course.image_url ? (
+            <img src={course.image_url} alt={course.name} className="modal-split-photo"
+              onError={(e) => { e.target.style.opacity = 0.15 }} />
+          ) : (
+            <div className="modal-split-photo modal-split-photo--empty" />
           )}
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <h3 style={{ marginBottom: '0.25rem' }}>{course.name}</h3>
-            <span className="badge" style={{ background: course.calendar_color + '33', color: course.calendar_color }}>
-              {course.level}
-            </span>
-            <p className="tag-dim" style={{ marginTop: '0.75rem', lineHeight: 1.5 }}>{course.description}</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginTop: '1.25rem' }}>
-          <div className="sch-info-item">
-            <span className="sch-info-label">📅 Día</span>
-            <span>{WEEKDAY_NAMES[session.weekday]}</span>
-          </div>
-          <div className="sch-info-item">
-            <span className="sch-info-label">🕐 Horario</span>
-            <span>{session.start_time}–{session.end_time}</span>
-          </div>
-          <div className="sch-info-item">
-            <span className="sch-info-label">📍 Sala</span>
-            <span>{session.room || course.room || '—'}</span>
-          </div>
-          <div className="sch-info-item">
-            <span className="sch-info-label">💶 Precio</span>
-            <span style={{ color: 'var(--green)', fontWeight: 700 }}>{Number(course.price)}€/mes</span>
-          </div>
-        </div>
-
-        {course.teachers?.length > 0 && (
-          <div style={{ marginTop: '1rem' }}>
-            <p className="sch-info-label" style={{ marginBottom: '0.5rem' }}>👤 Profesores</p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {course.teachers?.length > 0 && (
+            <div className="modal-split-teachers">
               {course.teachers.map((tc) => (
-                <div key={tc.id} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <div key={tc.id} className="modal-teacher-chip">
                   {tc.photo_url && (
                     <img src={tc.photo_url} alt={tc.full_name}
-                      style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }}
                       onError={(e) => { e.target.style.display = 'none' }} />
                   )}
-                  <span style={{ fontSize: '0.9rem' }}>{tc.full_name}</span>
+                  <span>{tc.full_name}</span>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-          <a className="btn btn-primary"
-            href={whatsappLink(`Hola! Me interesa el curso ${course.name} (${WEEKDAY_NAMES[session.weekday]} ${session.start_time}).`)}
-            target="_blank" rel="noreferrer">
-            💬 Apuntarme por WhatsApp
-          </a>
-          <Link to="/contacto" className="btn btn-ghost" onClick={onClose}>
-            Formulario de contacto
-          </Link>
+        {/* Columna derecha — detalles */}
+        <div className="modal-split-body">
+          <div className="modal-split-accent" style={{ background: course.calendar_color }} />
+          <span className="badge" style={{ background: course.calendar_color + '33', color: course.calendar_color, marginBottom: '0.5rem', display: 'inline-block' }}>
+            {course.level}
+          </span>
+          <h3 className="modal-split-title">{course.name}</h3>
+          {course.description && (
+            <p className="modal-split-desc">{course.description}</p>
+          )}
+
+          <div className="modal-info-grid">
+            <div className="sch-info-item">
+              <span className="sch-info-label">📅 Día</span>
+              <span>{WEEKDAY_NAMES[session.weekday]}</span>
+            </div>
+            <div className="sch-info-item">
+              <span className="sch-info-label">🕐 Horario</span>
+              <span>{session.start_time}–{session.end_time}</span>
+            </div>
+            <div className="sch-info-item">
+              <span className="sch-info-label">📍 Sala</span>
+              <span>{session.room || course.room || '—'}</span>
+            </div>
+            <div className="sch-info-item">
+              <span className="sch-info-label">💶 Precio</span>
+              <span style={{ color: 'var(--green)', fontWeight: 700 }}>{Number(course.price)}€/mes</span>
+            </div>
+          </div>
+
+          <div className="modal-split-actions">
+            <a className="btn btn-primary"
+              href={whatsappLink(`Hola! Me interesa el curso ${course.name} (${WEEKDAY_NAMES[session.weekday]} ${session.start_time}).`)}
+              target="_blank" rel="noreferrer">
+              💬 Apuntarme por WhatsApp
+            </a>
+            <Link to="/contacto" className="btn btn-ghost" onClick={onClose}>
+              Formulario
+            </Link>
+          </div>
         </div>
       </div>
     </Modal>
   )
 }
 
+// ── Modal de evento ────────────────────────────────────────────────────────────
+
 function EventModal({ event, onClose }) {
   return (
     <Modal onClose={onClose} large>
-      <div className="modal-content">
-        {event.image_url && (
-          <img src={event.image_url} alt={event.name} className="modal-img"
-            style={{ borderRadius: 10, marginBottom: '1.25rem' }}
-            onError={(e) => { e.target.style.display = 'none' }} />
-        )}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-          <span style={{ fontSize: '1.2rem' }}>🎉</span>
-          <h3 style={{ margin: 0 }}>{event.name}</h3>
-        </div>
-        {event.subtitle && <p className="tag-dim" style={{ marginBottom: '0.75rem' }}>{event.subtitle}</p>}
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '1rem' }}>
-          {event.date && (
-            <div className="sch-info-item">
-              <span className="sch-info-label">📅 Fecha</span>
-              <span>{event.date}</span>
-            </div>
-          )}
-          {event.time_range && (
-            <div className="sch-info-item">
-              <span className="sch-info-label">🕐 Horario</span>
-              <span>{event.time_range}</span>
-            </div>
-          )}
-          {event.location && (
-            <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
-              <span className="sch-info-label">📍 Lugar</span>
-              <span>{event.location}</span>
-            </div>
-          )}
-          {event.artists && (
-            <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
-              <span className="sch-info-label">🎵 Artistas</span>
-              <span>{event.artists}</span>
-            </div>
+      <div className="modal-split">
+        {/* Columna izquierda — flyer */}
+        <div className="modal-split-img modal-split-img--event">
+          {event.image_url ? (
+            <img src={event.image_url} alt={event.name} className="modal-split-photo"
+              onError={(e) => { e.target.style.display = 'none' }} />
+          ) : (
+            <div className="modal-split-photo modal-split-photo--empty">🎉</div>
           )}
         </div>
 
-        {event.description && (
-          <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: '1rem' }}>{event.description}</p>
-        )}
-
-        {event.activities && (
-          <div style={{ marginBottom: '1rem' }}>
-            <p className="sch-info-label" style={{ marginBottom: '0.4rem' }}>📋 Programa</p>
-            {event.activities.split('\n').filter(Boolean).map((a, i) => (
-              <p key={i} className="tag-dim" style={{ margin: '0.2rem 0' }}>· {a}</p>
-            ))}
+        {/* Columna derecha — detalles */}
+        <div className="modal-split-body">
+          <div className="modal-split-accent modal-split-accent--event" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+            <span style={{ fontSize: '1.3rem' }}>🎉</span>
+            <h3 className="modal-split-title" style={{ margin: 0 }}>{event.name}</h3>
           </div>
-        )}
+          {event.subtitle && (
+            <p className="modal-split-desc" style={{ color: '#F59E0B' }}>{event.subtitle}</p>
+          )}
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-          <a className="btn btn-primary"
-            href={whatsappLink(`Hola! Quiero información sobre el evento: ${event.name} (${event.date})`)}
-            target="_blank" rel="noreferrer">
-            💬 Más info por WhatsApp
-          </a>
-          <Link to="/eventos" className="btn btn-ghost" onClick={onClose}>
-            Ver todos los eventos
-          </Link>
+          <div className="modal-info-grid">
+            {event.date && (
+              <div className="sch-info-item">
+                <span className="sch-info-label">📅 Fecha</span>
+                <span>{event.date}</span>
+              </div>
+            )}
+            {event.time_range && (
+              <div className="sch-info-item">
+                <span className="sch-info-label">🕐 Horario</span>
+                <span>{event.time_range}</span>
+              </div>
+            )}
+            {event.location && (
+              <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
+                <span className="sch-info-label">📍 Lugar</span>
+                <span>{event.location}</span>
+              </div>
+            )}
+            {event.artists && (
+              <div className="sch-info-item" style={{ gridColumn: '1 / -1' }}>
+                <span className="sch-info-label">🎵 Artistas</span>
+                <span>{event.artists}</span>
+              </div>
+            )}
+          </div>
+
+          {event.description && (
+            <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, margin: '0.75rem 0 0' }}>{event.description}</p>
+          )}
+
+          {event.activities && (
+            <div style={{ marginTop: '0.75rem' }}>
+              <p className="sch-info-label" style={{ marginBottom: '0.35rem' }}>📋 Programa</p>
+              {event.activities.split('\n').filter(Boolean).map((a, i) => (
+                <p key={i} className="tag-dim" style={{ margin: '0.15rem 0', fontSize: '0.9rem' }}>· {a}</p>
+              ))}
+            </div>
+          )}
+
+          <div className="modal-split-actions">
+            <a className="btn btn-primary"
+              href={whatsappLink(`Hola! Quiero información sobre el evento: ${event.name} (${event.date})`)}
+              target="_blank" rel="noreferrer">
+              💬 Más info por WhatsApp
+            </a>
+            <Link to="/eventos" className="btn btn-ghost" onClick={onClose}>
+              Ver eventos
+            </Link>
+          </div>
         </div>
       </div>
     </Modal>
@@ -219,7 +233,7 @@ export default function Schedule() {
   const [filterCourse, setFilterCourse] = useState('')
   const [filterTeacher, setFilterTeacher] = useState('')
   const [filterType, setFilterType] = useState('all')  // 'all' | 'courses' | 'events'
-  const [selected, setSelected] = useState(null) // { type: 'course'|'event', ... }
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     getCourses().then(setCourses).catch(() => {})
@@ -235,13 +249,11 @@ export default function Schedule() {
     return m
   }, [courses])
 
-  // Mapa de eventos por fecha YMD
   const eventsByDate = useMemo(() => {
     const m = {}
     events.forEach((e) => {
-      const key = e.date // ya viene como "YYYY-MM-DD"
-      if (!m[key]) m[key] = []
-      m[key].push(e)
+      if (!m[e.date]) m[e.date] = []
+      m[e.date].push(e)
     })
     return m
   }, [events])
@@ -254,7 +266,6 @@ export default function Schedule() {
     return true
   })
 
-  // Cuando el filtro es 'courses', no mostrar eventos en el calendario
   const visibleEventsByDate = useMemo(() => {
     if (filterType === 'courses') return {}
     return eventsByDate
@@ -262,6 +273,23 @@ export default function Schedule() {
 
   const openCourse = (session) => setSelected({ type: 'course', session, course: courseById[session.course_id] })
   const openEvent = (event) => setSelected({ type: 'event', event })
+
+  function toggleType(type) {
+    setFilterType((prev) => {
+      if (type === 'courses') {
+        if (prev === 'courses') return 'all'
+        if (prev === 'events') return 'all'
+        return 'courses'
+      }
+      if (type === 'events') {
+        if (prev === 'events') return 'all'
+        if (prev === 'courses') return 'all'
+        return 'events'
+      }
+      return 'all'
+    })
+    if (type === 'events') { setFilterCourse(''); setFilterTeacher('') }
+  }
 
   // ── Vista semanal ────────────────────────────────────────────────────────────
   function WeekView() {
@@ -385,51 +413,48 @@ export default function Schedule() {
   return (
     <div className="container section">
       <Reveal>
-        <h2 className="section-title">{t('schedule.title')}</h2>
-        <p className="section-sub">{t('schedule.subtitle')}</p>
+        <p className="section-sub" style={{ marginBottom: '1.25rem' }}>{t('schedule.subtitle')}</p>
       </Reveal>
 
-      {/* Tabs de vista */}
-      <div className="cal-tabs">
-        <button className={view === 'semanal' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('semanal')}>
-          Semana
-        </button>
-        <button className={view === 'monthly' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('monthly')}>
-          Mes
-        </button>
-      </div>
-
-      {/* Filtro de tipo */}
-      <div className="sch-type-filter">
-        {[
-          { v: 'all',     label: 'Todo',          icon: '◉' },
-          { v: 'courses', label: 'Solo clases',    icon: '●' },
-          { v: 'events',  label: 'Solo eventos',   icon: '🎉' },
-        ].map(({ v, label, icon }) => (
-          <button key={v}
-            className={`sch-type-btn${filterType === v ? ' active' : ''}`}
-            onClick={() => {
-              setFilterType(v)
-              if (v === 'events') { setFilterCourse(''); setFilterTeacher('') }
-            }}>
-            <span>{icon}</span> {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Filtros de curso/profesor — ocultos en modo solo eventos */}
-      {filterType !== 'events' && (
-        <div className="cal-filters">
-          <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
-            <option value="">Todos los cursos</option>
-            {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-          <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
-            <option value="">Todos los profesores</option>
-            {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
-          </select>
+      {/* Barra de controles: tabs + tipo + filtros en dos columnas */}
+      <div className="cal-bar">
+        <div className="cal-bar-left">
+          <div className="cal-tabs">
+            <button className={view === 'semanal' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('semanal')}>
+              Vista semanal
+            </button>
+            <button className={view === 'monthly' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('monthly')}>
+              Vista mensual
+            </button>
+          </div>
+          <div className="cal-type-pills">
+            <button
+              className={`cal-pill cal-pill--course${filterType === 'courses' ? ' active' : ''}`}
+              onClick={() => toggleType('courses')}>
+              ● Clases
+            </button>
+            <button
+              className={`cal-pill cal-pill--event${filterType === 'events' ? ' active' : ''}`}
+              onClick={() => toggleType('events')}>
+              🎉 Eventos
+            </button>
+          </div>
         </div>
-      )}
+
+        {filterType !== 'events' && (
+          <div className="cal-bar-right">
+            <span className="cal-filter-label">Filtros</span>
+            <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
+              <option value="">Todos los cursos</option>
+              {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
+              <option value="">Todos los profesores</option>
+              {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
+            </select>
+          </div>
+        )}
+      </div>
 
       {view === 'semanal' && <WeekView />}
       {view === 'monthly' && <MonthView />}
@@ -437,7 +462,6 @@ export default function Schedule() {
       {/* Tabla de precios */}
       <Reveal>
         <div className="sch-prices">
-          <h3>{t('schedule.prices')}</h3>
           <div className="price-table">
             <table>
               <thead>

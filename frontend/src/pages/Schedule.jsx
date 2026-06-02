@@ -274,21 +274,18 @@ export default function Schedule() {
   const openCourse = (session) => setSelected({ type: 'course', session, course: courseById[session.course_id] })
   const openEvent = (event) => setSelected({ type: 'event', event })
 
-  function toggleType(type) {
-    setFilterType((prev) => {
-      if (type === 'courses') {
-        if (prev === 'courses') return 'all'
-        if (prev === 'events') return 'all'
-        return 'courses'
-      }
-      if (type === 'events') {
-        if (prev === 'events') return 'all'
-        if (prev === 'courses') return 'all'
-        return 'events'
-      }
-      return 'all'
-    })
-    if (type === 'events') { setFilterCourse(''); setFilterTeacher('') }
+  // Valor del selector combinado cursos+eventos
+  const courseSelectValue = filterType === 'events' ? '__events__' : filterCourse
+
+  const handleCourseSelect = (val) => {
+    if (val === '__events__') {
+      setFilterType('events')
+      setFilterCourse('')
+      setFilterTeacher('')
+    } else {
+      setFilterType(val ? 'courses' : 'all')
+      setFilterCourse(val)
+    }
   }
 
   // ── Vista semanal ────────────────────────────────────────────────────────────
@@ -418,7 +415,6 @@ export default function Schedule() {
 
       {/* Barra de controles */}
       <div className="cal-bar">
-        {/* Izquierda: toggle semanal/mensual */}
         <div className="cal-toggle">
           <button
             className={`cal-toggle-btn${view === 'semanal' ? ' active' : ''}`}
@@ -432,33 +428,19 @@ export default function Schedule() {
           </button>
         </div>
 
-        {/* Derecha: Clases / Eventos + filtros */}
         <div className="cal-bar-right">
-          <div className="cal-type-pills">
-            <button
-              className={`cal-pill cal-pill--course${filterType === 'courses' ? ' active' : ''}`}
-              onClick={() => toggleType('courses')}>
-              ● Clases
-            </button>
-            <button
-              className={`cal-pill cal-pill--event${filterType === 'events' ? ' active' : ''}`}
-              onClick={() => toggleType('events')}>
-              🎉 Eventos
-            </button>
-          </div>
           {filterType !== 'events' && (
-            <>
-              <span className="cal-filter-label">Filtros</span>
-              <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
-                <option value="">Todos los cursos</option>
-                {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
-                <option value="">Todos los profesores</option>
-                {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
-              </select>
-            </>
+            <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
+              <option value="">Todos los profesores</option>
+              {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
+            </select>
           )}
+          <select value={courseSelectValue} onChange={(e) => handleCourseSelect(e.target.value)}>
+            <option value="">Todos los cursos</option>
+            {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            <option disabled>──────────</option>
+            <option value="__events__">🎉 Eventos</option>
+          </select>
         </div>
       </div>
 

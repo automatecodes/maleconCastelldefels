@@ -27,7 +27,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
-    os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+    os.makedirs(settings.media_root, exist_ok=True)
 
 
 @app.get("/api/health")
@@ -36,8 +36,8 @@ def health():
 
 
 # Servir media (imágenes, vídeos, CV en PDF, etc.)
-if os.path.isdir(settings.MEDIA_ROOT):
-    app.mount("/media", StaticFiles(directory=settings.MEDIA_ROOT), name="media")
+if os.path.isdir(settings.media_root):
+    app.mount("/media", StaticFiles(directory=settings.media_root), name="media")
 
 for r in (auth, public, students, teachers, courses, events, leads, enrollments,
           stats, media, images, themes, video_settings):

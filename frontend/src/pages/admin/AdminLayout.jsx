@@ -37,9 +37,8 @@ export default function AdminLayout({ adminBase = '/gurutiadmin' }) {
         <Link to="/" className="admin-brand-link">
           <img src="/logo.png" alt="elMalecón" className="admin-logo"
             onError={(e) => { e.target.style.display = 'none' }} />
-          <span className="brand-fallback admin-brand">el<span className="accent">Malecón</span></span>
         </Link>
-        <span className="tag-dim" style={{ fontSize: '0.75rem' }}>{t('common.admin')}</span>
+        <span className="tag-dim" style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>{t('common.admin')}</span>
         <nav className="admin-nav">
           {links.map((l) => (
             <NavLink key={l.to} to={l.to}

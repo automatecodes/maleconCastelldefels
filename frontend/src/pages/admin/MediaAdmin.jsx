@@ -120,7 +120,7 @@ export default function MediaAdmin() {
   const load = (path) => {
     setLoading(true)
     setUploadMsg('')
-    fetch(`/api/admin/media?folder=${encodeURIComponent(path)}`, { headers: AUTH() })
+    fetch(`/api/admin/media/list?folder=${encodeURIComponent(path)}`, { headers: AUTH() })
       .then((r) => r.json())
       .then((d) => setItems(d.items || []))
       .catch(() => setUploadMsg('Error cargando archivos'))

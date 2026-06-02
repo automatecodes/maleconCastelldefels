@@ -1,4 +1,5 @@
 """Configuración central leída desde variables de entorno (.env)."""
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -60,8 +61,17 @@ class Settings(BaseSettings):
     PAYMENT_PROVIDER: str = ""
     PAYMENT_KEY: str = ""
 
-    # Media
-    MEDIA_ROOT: str = "/data/media"
+    # Media — /data/media en Docker; la propiedad media_root hace fallback al repo en local
+    MEDIA_ROOT: str = ""
+
+    @property
+    def media_root(self) -> str:
+        if self.MEDIA_ROOT:
+            return self.MEDIA_ROOT
+        docker_path = "/data/media"
+        if os.path.isdir(docker_path):
+            return docker_path
+        return str(Path(__file__).resolve().parents[3] / "data" / "media")
 
     # Permite sobreescribir la URL de BD directamente (útil para tests con SQLite)
     DATABASE_URL: str = ""

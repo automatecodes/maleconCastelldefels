@@ -42,7 +42,7 @@ def upload(folder: str = Form(...), file: UploadFile = File(...),
     if ext not in ALLOWED:
         raise HTTPException(400, f"Extensión no permitida: {ext}")
     safe_folder = folder.strip("/").replace("..", "")
-    target_dir = os.path.join(settings.MEDIA_ROOT, safe_folder)
+    target_dir = os.path.join(settings.media_root, safe_folder)
     os.makedirs(target_dir, exist_ok=True)
     target_path = os.path.join(target_dir, file.filename)
     with open(target_path, "wb") as out:
@@ -63,7 +63,7 @@ def upload(folder: str = Form(...), file: UploadFile = File(...),
 @router.get("/list")
 def list_media(folder: str = ""):
     safe_folder = folder.strip("/").replace("..", "")
-    target_dir = os.path.join(settings.MEDIA_ROOT, safe_folder)
+    target_dir = os.path.join(settings.media_root, safe_folder)
     if not os.path.isdir(target_dir):
         return {"items": [], "folder": safe_folder}
     items = []
@@ -78,9 +78,8 @@ def list_media(folder: str = ""):
             "name": name,
             "path": rel,
             "url": f"/media/{rel}" if not is_dir else None,
-            "is_dir": is_dir,
-            "size_bytes": os.path.getsize(full) if not is_dir else None,
-            "file_type": _file_type(ext) if not is_dir else "folder",
+            "type": "folder" if is_dir else _file_type(ext),
+            "size": os.path.getsize(full) if not is_dir else None,
         })
     return {"items": items, "folder": safe_folder}
 
@@ -88,7 +87,7 @@ def list_media(folder: str = ""):
 @router.delete("/delete")
 def delete_file(path: str, db: Session = Depends(get_db)):
     safe_path = path.strip("/").replace("..", "")
-    full = os.path.join(settings.MEDIA_ROOT, safe_path)
+    full = os.path.join(settings.media_root, safe_path)
     if not os.path.exists(full):
         raise HTTPException(404, "Archivo no encontrado")
     if os.path.isdir(full):

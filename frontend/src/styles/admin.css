@@ -2,7 +2,7 @@
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
   background:
-    radial-gradient(circle at 30% 20%, rgba(47,229,107,0.12), transparent 45%),
+    radial-gradient(circle at 30% 20%, rgba(113,230,40,0.12), transparent 45%),
     var(--bg);
 }
 
@@ -21,7 +21,7 @@
   font-weight: 500; transition: all 0.2s;
 }
 .admin-link:hover { color: var(--text); background: var(--surface-2); }
-.admin-link.active { background: rgba(47,229,107,0.12); color: var(--green); }
+.admin-link.active { background: rgba(113,230,40,0.12); color: var(--green); }
 .admin-logout { margin-top: auto; }
 
 .admin-main { flex: 1; padding: 2rem; max-width: 100%; overflow-x: hidden; }

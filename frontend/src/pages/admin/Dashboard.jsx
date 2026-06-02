@@ -6,7 +6,7 @@ import {
 } from 'recharts'
 import { adminGet } from '../../api/client'
 
-const COLORS = ['#2FE56B', '#F59E0B', '#2F9EE5', '#B62FE5', '#E5482F', '#25C75B']
+const COLORS = ['#71e628', '#F59E0B', '#2F9EE5', '#B62FE5', '#E5482F', '#60c422']
 
 function Kpi({ label, value, suffix }) {
   return (
@@ -90,7 +90,7 @@ export default function Dashboard() {
               <XAxis dataKey="month" stroke="#9AA39C" fontSize={11} />
               <YAxis stroke="#9AA39C" allowDecimals={false} />
               <Tooltip contentStyle={{ background: '#121814', border: '1px solid #1E2622' }} />
-              <Line type="monotone" dataKey="count" stroke="#2FE56B" strokeWidth={2} />
+              <Line type="monotone" dataKey="count" stroke="#71e628" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>

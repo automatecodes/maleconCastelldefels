@@ -9,7 +9,7 @@ Ejecutar:  python -m app.seed
 from datetime import date, datetime
 
 from app.core.config import settings
-from app.core.database import SessionLocal, engine
+from app.core.database import SessionLocal, engine, Base
 from app.core.security import get_password_hash
 from app import models
 
@@ -23,7 +23,7 @@ def upsert_setting(db, key: str, value: str):
 
 
 def run():
-    models.Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         # ── Admin users ──────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ def run():
             db.flush()
             course_map[c["slug"]] = course.id
             course.teachers = [
-                db.query(models.Teacher).get(teacher_map[s])
+                db.get(models.Teacher, teacher_map[s])
                 for s in c["teacher_slugs"] if s in teacher_map
             ]
             db.query(models.ClassSession).filter_by(course_id=course.id).delete()

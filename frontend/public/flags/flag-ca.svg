@@ -3,29 +3,25 @@
     <clipPath id="c"><circle cx="30" cy="30" r="30"/></clipPath>
   </defs>
   <g clip-path="url(#c)">
-    <!-- Senyera: 9 franjas alternadas oro/rojo (5 oro, 4 rojo) -->
+    <!-- Senyera: fondo oro + 4 franjas rojas, cada una de 6.67px cada 13.33px -->
     <rect width="60" height="60" fill="#FCDD09"/>
-    <rect y="6.67"  width="60" height="6.67" fill="#CF0921"/>
-    <rect y="20"    width="60" height="6.67" fill="#CF0921"/>
-    <rect y="33.33" width="60" height="6.67" fill="#CF0921"/>
-    <rect y="46.67" width="60" height="6.67" fill="#CF0921"/>
-
-    <!-- Triángulo azul (Estelada blava) — vértice derecho en (28, 30) -->
+    <rect x="0" y="6.67"  width="60" height="6.67" fill="#CF0921"/>
+    <rect x="0" y="20"    width="60" height="6.67" fill="#CF0921"/>
+    <rect x="0" y="33.33" width="60" height="6.67" fill="#CF0921"/>
+    <rect x="0" y="46.67" width="60" height="6.67" fill="#CF0921"/>
+    <!-- Triángulo azul de la Estelada -->
     <polygon points="0,0 0,60 28,30" fill="#003189"/>
-
-    <!-- Estrella blanca de 5 puntas, centrada en el triángulo (~13, 30) -->
-    <!-- Radio exterior: 7, radio interior: 2.8 -->
-    <polygon
-      points="13,23
-              14.6,27.9
-              19.7,27.9
-              15.5,30.9
-              17.2,35.8
-              13,32.8
-              8.8,35.8
-              10.5,30.9
-              6.3,27.9
-              11.4,27.9"
-      fill="white"/>
+    <!-- Estrella blanca de 5 puntas centrada en (10, 30), R=7, r=2.67 -->
+    <polygon fill="white"
+      points="10,23
+              11.6,27.8
+              16.7,27.8
+              12.5,30.8
+              14.1,35.7
+              10,32.7
+              5.9,35.7
+              7.5,30.8
+              3.3,27.8
+              8.4,27.8"/>
   </g>
 </svg>

@@ -128,14 +128,88 @@
 .cookie-actions { display: flex; gap: 0.6rem; }
 
 /* ---------- Footer ---------- */
-.site-footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 3rem; padding: 3rem 0 1.5rem; }
-.footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
-.footer-brand { font-size: 1.6rem; margin-bottom: 0.5rem; }
-.site-footer h4 { margin-bottom: 0.75rem; font-size: 1rem; }
-.footer-social, .footer-links { display: flex; flex-direction: column; gap: 0.4rem; }
-.footer-social a, .footer-links a { color: var(--text-dim); transition: color 0.2s; }
-.footer-social a:hover, .footer-links a:hover { color: var(--green); }
-.footer-bottom { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; }
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  margin-top: 2rem;
+  padding: 2rem 0 0;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1.4fr 1.4fr;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+}
+.footer-col { display: flex; flex-direction: column; gap: 0; }
+.footer-brand {
+  font-size: 1.7rem; font-weight: 900; font-family: var(--font-head);
+  letter-spacing: -0.01em; margin-bottom: 0.5rem; line-height: 1;
+}
+.footer-tagline {
+  color: var(--text-dim); font-size: 0.85rem; line-height: 1.55;
+  margin: 0;
+}
+.footer-col-title {
+  font-size: 0.95rem; font-weight: 700; color: var(--text);
+  margin: 0 0 0.7rem; letter-spacing: 0.01em;
+}
+.footer-links {
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.footer-links a {
+  color: var(--text-dim); font-size: 0.88rem; transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--green); }
+
+/* Ítems de contacto / horario */
+.footer-contact { display: flex; flex-direction: column; gap: 0.45rem; }
+.footer-ci {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  color: var(--text-dim); font-size: 0.85rem; line-height: 1.45;
+}
+.footer-ci a { color: var(--text-dim); transition: color 0.2s; }
+.footer-ci a:hover { color: var(--green); }
+.footer-ci-icon {
+  color: var(--green); flex-shrink: 0; margin-top: 1px;
+  width: 15px; height: 15px; display: flex;
+}
+.footer-ci-icon svg { width: 15px; height: 15px; }
+
+/* Fila Síguenos + iconos redondos */
+.footer-social-row {
+  display: flex; align-items: center; gap: 0.45rem;
+  margin-top: 1rem; flex-wrap: wrap;
+}
+.footer-follow-label {
+  font-size: 0.78rem; color: var(--text-dim);
+  font-weight: 600; white-space: nowrap; margin-right: 0.1rem;
+}
+.footer-soc-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); transition: background 0.2s, color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.footer-soc-btn:hover { background: var(--green); color: #07160c; border-color: var(--green); }
+.footer-soc-btn svg { width: 14px; height: 14px; }
+
+/* Barra inferior */
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 0.9rem 0;
+  text-align: center;
+  font-size: 0.82rem;
+}
+.footer-bottom a { color: var(--text-dim); transition: color 0.2s; }
+.footer-bottom a:hover { color: var(--green); }
+
+@media (max-width: 860px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
 
 /* ---------- Modal close ---------- */
 .modal-close { position: sticky; top: 0; float: right; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; padding: 1rem; z-index: 5; }
@@ -327,9 +401,4 @@
 .legal-content h3 { margin: 1.5rem 0 0.5rem; color: var(--green); }
 .legal-content p, .legal-content li { color: var(--text-dim); margin-bottom: 0.75rem; }
 
-/* Footer social icons row */
-.footer-social-icons { display: flex; gap: 0.75rem; align-items: center; margin: 0.5rem 0; }
-.footer-social-icon { color: var(--text-dim); transition: color 0.2s; display: flex; align-items: center; }
-.footer-social-icon:hover { color: var(--green); }
-.footer-social-icon svg { width: 20px; height: 20px; fill: currentColor; }
 .legal-content ul { padding-left: 1.25rem; }

@@ -153,9 +153,7 @@ th { color: var(--text-dim); font-weight: 600; font-size: 0.78rem; text-transfor
 .nav-link:hover, .nav-link.active { color: var(--green); }
 .menu-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.6rem; cursor: pointer; }
 
-.lang-selector { display: flex; gap: 0.25rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.2rem; }
-.lang { background: none; border: none; color: var(--text-dim); font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 999px; cursor: pointer; }
-.lang.active { background: var(--green); color: #07160c; }
+/* lang-selector → layout.css */
 
 @media (max-width: 860px) {
   .menu-toggle { display: block; }
@@ -236,15 +234,7 @@ th { color: var(--text-dim); font-weight: 600; font-size: 0.78rem; text-transfor
 }
 .cookie-actions { display: flex; gap: 0.6rem; }
 
-/* ---------- Footer ---------- */
-.site-footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 3rem; padding: 3rem 0 1.5rem; }
-.footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
-.footer-brand { font-size: 1.6rem; margin-bottom: 0.5rem; }
-.site-footer h4 { margin-bottom: 0.75rem; font-size: 1rem; }
-.footer-social, .footer-links { display: flex; flex-direction: column; gap: 0.4rem; }
-.footer-social a, .footer-links a { color: var(--text-dim); transition: color 0.2s; }
-.footer-social a:hover, .footer-links a:hover { color: var(--green); }
-.footer-bottom { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; }
+/* ---------- Footer → layout.css ---------- */
 
 /* ---------- Modal close ---------- */
 .modal-close { position: sticky; top: 0; float: right; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; padding: 1rem; z-index: 5; }

@@ -224,7 +224,7 @@ function EventModal({ event, onClose }) {
 
 export default function Schedule() {
   const { t } = useTranslation()
-  const [view, setView] = useState('semanal')
+  const [view, setView] = useState('monthly')
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [monthOffset, setMonthOffset] = useState(0)
   const [courses, setCourses] = useState([])
@@ -274,18 +274,9 @@ export default function Schedule() {
   const openCourse = (session) => setSelected({ type: 'course', session, course: courseById[session.course_id] })
   const openEvent = (event) => setSelected({ type: 'event', event })
 
-  // Valor del selector combinado cursos+eventos
-  const courseSelectValue = filterType === 'events' ? '__events__' : filterCourse
-
-  const handleCourseSelect = (val) => {
-    if (val === '__events__') {
-      setFilterType('events')
-      setFilterCourse('')
-      setFilterTeacher('')
-    } else {
-      setFilterType(val ? 'courses' : 'all')
-      setFilterCourse(val)
-    }
+  const handleTypeSelect = (val) => {
+    setFilterType(val)
+    if (val === 'events') { setFilterCourse(''); setFilterTeacher('') }
   }
 
   // ── Vista semanal ────────────────────────────────────────────────────────────
@@ -429,18 +420,23 @@ export default function Schedule() {
         </div>
 
         <div className="cal-bar-right">
+          <select value={filterType} onChange={(e) => handleTypeSelect(e.target.value)}>
+            <option value="all">Clases y eventos</option>
+            <option value="events">🎉 Solo eventos</option>
+            <option value="courses">● Solo clases</option>
+          </select>
           {filterType !== 'events' && (
             <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
               <option value="">Todos los profesores</option>
               {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
             </select>
           )}
-          <select value={courseSelectValue} onChange={(e) => handleCourseSelect(e.target.value)}>
-            <option value="">Todos los cursos</option>
-            {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            <option disabled>──────────</option>
-            <option value="__events__">🎉 Eventos</option>
-          </select>
+          {filterType !== 'events' && (
+            <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
+              <option value="">Todos los cursos</option>
+              {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          )}
         </div>
       </div>
 

@@ -218,6 +218,7 @@ export default function Schedule() {
   const [events, setEvents] = useState([])
   const [filterCourse, setFilterCourse] = useState('')
   const [filterTeacher, setFilterTeacher] = useState('')
+  const [filterType, setFilterType] = useState('all')  // 'all' | 'courses' | 'events'
   const [selected, setSelected] = useState(null) // { type: 'course'|'event', ... }
 
   useEffect(() => {
@@ -245,13 +246,19 @@ export default function Schedule() {
     return m
   }, [events])
 
-  const visibleSessions = sessions.filter((s) => {
+  const visibleSessions = filterType === 'events' ? [] : sessions.filter((s) => {
     const c = courseById[s.course_id]
     if (!c) return false
     if (filterCourse && String(c.id) !== filterCourse) return false
     if (filterTeacher && !c.teachers?.some((tc) => String(tc.id) === filterTeacher)) return false
     return true
   })
+
+  // Cuando el filtro es 'courses', no mostrar eventos en el calendario
+  const visibleEventsByDate = useMemo(() => {
+    if (filterType === 'courses') return {}
+    return eventsByDate
+  }, [filterType, eventsByDate])
 
   const openCourse = (session) => setSelected({ type: 'course', session, course: courseById[session.course_id] })
   const openEvent = (event) => setSelected({ type: 'event', event })
@@ -271,7 +278,7 @@ export default function Schedule() {
         <div className="week-grid">
           {days.map((day, idx) => {
             const ymd = toYMD(day)
-            const dayEvents = eventsByDate[ymd] || []
+            const dayEvents = visibleEventsByDate[ymd] || []
             const daySessions = visibleSessions.filter((s) => s.weekday === idx)
               .sort((a, b) => a.start_time.localeCompare(b.start_time))
             const isToday = ymd === toYMD(new Date())
@@ -328,7 +335,7 @@ export default function Schedule() {
             const ymd = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
             const weekday = (new Date(year, month, d).getDay() + 6) % 7
             const daySessions = visibleSessions.filter((s) => s.weekday === weekday)
-            const dayEvents = eventsByDate[ymd] || []
+            const dayEvents = visibleEventsByDate[ymd] || []
             const isToday = ymd === todayYMD
             return (
               <div key={idx} className={`month-cell${isToday ? ' month-cell--today' : ''}`}>
@@ -392,23 +399,37 @@ export default function Schedule() {
         </button>
       </div>
 
-      {/* Leyenda */}
-      <div className="sch-legend">
-        <span className="sch-legend-item sch-legend-item--course">● Clases semanales</span>
-        <span className="sch-legend-item sch-legend-item--event">🎉 Eventos</span>
+      {/* Filtro de tipo */}
+      <div className="sch-type-filter">
+        {[
+          { v: 'all',     label: 'Todo',          icon: '◉' },
+          { v: 'courses', label: 'Solo clases',    icon: '●' },
+          { v: 'events',  label: 'Solo eventos',   icon: '🎉' },
+        ].map(({ v, label, icon }) => (
+          <button key={v}
+            className={`sch-type-btn${filterType === v ? ' active' : ''}`}
+            onClick={() => {
+              setFilterType(v)
+              if (v === 'events') { setFilterCourse(''); setFilterTeacher('') }
+            }}>
+            <span>{icon}</span> {label}
+          </button>
+        ))}
       </div>
 
-      {/* Filtros */}
-      <div className="cal-filters">
-        <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
-          <option value="">Todos los cursos</option>
-          {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
-          <option value="">Todos los profesores</option>
-          {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
-        </select>
-      </div>
+      {/* Filtros de curso/profesor — ocultos en modo solo eventos */}
+      {filterType !== 'events' && (
+        <div className="cal-filters">
+          <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
+            <option value="">Todos los cursos</option>
+            {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
+            <option value="">Todos los profesores</option>
+            {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
+          </select>
+        </div>
+      )}
 
       {view === 'semanal' && <WeekView />}
       {view === 'monthly' && <MonthView />}

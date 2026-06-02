@@ -1,5 +1,7 @@
 # elMalecón Castelldefels — elmaleconcastelldefels.com
 
+<!-- Actualizado junio 2026 — test de flujo commit+rebuild -->
+
 Web pública multi-idioma (ES/CA/EN) + panel de administración completo con CRM, calendario
 visual, media explorer, generación de imágenes con IA, y formulario de contacto integrado
 con WhatsApp y email.

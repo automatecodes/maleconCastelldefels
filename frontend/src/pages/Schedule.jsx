@@ -401,7 +401,7 @@ export default function Schedule() {
   return (
     <div className="container section">
       <Reveal>
-        <h1 className="section-title" style={{ marginBottom: '1.25rem' }}>{t('schedule.subtitle')}</h1>
+        <h2 className="section-title" style={{ marginBottom: '1.25rem' }}>{t('schedule.subtitle')}</h2>
       </Reveal>
 
       {/* Barra de controles */}

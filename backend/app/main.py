@@ -26,18 +26,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
-    from sqlalchemy import text
     Base.metadata.create_all(bind=engine)
     os.makedirs(settings.media_root, exist_ok=True)
-    # Migraciones incrementales — ADD COLUMN IF NOT EXISTS es idempotente en PostgreSQL
-    with engine.connect() as conn:
-        conn.execute(text(
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS photo_focal VARCHAR DEFAULT '50% 50%'"
-        ))
-        conn.execute(text(
-            "ALTER TABLE events ADD COLUMN IF NOT EXISTS image_focal VARCHAR DEFAULT '50% 50%'"
-        ))
-        conn.commit()
 
 
 @app.get("/api/health")

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Modal from '../../components/Modal'
 import AiImageButton from './AiImageButton'
+import MediaPicker from './MediaPicker'
 import { generateCourseImage } from '../../api/client'
 
 const API = '/api/admin'
@@ -308,13 +309,13 @@ export default function CoursesAdmin() {
                 <label>Estilo</label>
                 <input type="text" value={form.style} onChange={(e) => onChange('style', e.target.value)} />
               </div>
-              <div className="field">
-                <label>URL imagen</label>
-                <input type="text" value={form.image_url} onChange={(e) => onChange('image_url', e.target.value)} />
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <MediaPicker label="Imagen del curso" accept="image"
+                  value={form.image_url} onChange={(url) => onChange('image_url', url)} />
               </div>
-              <div className="field">
-                <label>URL vídeo</label>
-                <input type="text" value={form.video_url} onChange={(e) => onChange('video_url', e.target.value)} />
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <MediaPicker label="Vídeo del curso" accept="video"
+                  value={form.video_url} onChange={(url) => onChange('video_url', url)} />
               </div>
               <div className="field">
                 <label>Color calendario</label>

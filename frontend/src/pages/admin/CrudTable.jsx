@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { adminGet, adminPost, adminPut, adminDelete } from '../../api/client'
 import Modal from '../../components/Modal'
+import MediaPicker from './MediaPicker'
 
 /**
  * Tabla CRUD genérica para el admin.
@@ -87,6 +88,12 @@ export default function CrudTable({ title, resource, columns, fields, toPayload,
                   </select>
                 ) : f.type === 'textarea' ? (
                   <textarea rows="3" value={form[f.name] ?? ''} onChange={(e) => onChange(f.name, e.target.value)} />
+                ) : f.type === 'media' || f.type === 'image' || f.type === 'video' ? (
+                  <MediaPicker
+                    value={form[f.name] ?? ''}
+                    onChange={(url) => onChange(f.name, url)}
+                    accept={f.type === 'image' ? 'image' : f.type === 'video' ? 'video' : 'any'}
+                  />
                 ) : (
                   <input type={f.type || 'text'} value={form[f.name] ?? ''}
                     onChange={(e) => onChange(f.name, e.target.value)} />

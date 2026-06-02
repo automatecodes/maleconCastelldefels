@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import Modal from '../../components/Modal'
+import MediaPicker from './MediaPicker'
 
 const API = '/api/admin'
 const token = () => localStorage.getItem('token')
@@ -275,17 +276,17 @@ export default function TeachersAdmin() {
                 <label>Teléfono</label>
                 <input type="text" value={form.phone} onChange={(e) => onChange('phone', e.target.value)} />
               </div>
-              <div className="field">
-                <label>URL foto</label>
-                <input type="text" value={form.photo_url} onChange={(e) => onChange('photo_url', e.target.value)} />
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <MediaPicker label="Foto del profesor" accept="image"
+                  value={form.photo_url} onChange={(url) => onChange('photo_url', url)} />
               </div>
               <div className="field">
-                <label>URL CV (PDF)</label>
-                <input type="text" value={form.cv_pdf_url} onChange={(e) => onChange('cv_pdf_url', e.target.value)} />
+                <MediaPicker label="CV (PDF)" accept="pdf"
+                  value={form.cv_pdf_url} onChange={(url) => onChange('cv_pdf_url', url)} />
               </div>
               <div className="field">
-                <label>URL vídeo</label>
-                <input type="text" value={form.video_url} onChange={(e) => onChange('video_url', e.target.value)} />
+                <MediaPicker label="Vídeo" accept="video"
+                  value={form.video_url} onChange={(url) => onChange('video_url', url)} />
               </div>
               <div className="field">
                 <label>Disponibilidad</label>

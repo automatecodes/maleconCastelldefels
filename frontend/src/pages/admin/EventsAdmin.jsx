@@ -39,7 +39,7 @@ export default function EventsAdmin() {
         { name: 'name', label: 'Nombre' },
         { name: 'subtitle', label: 'Subtítulo' },
         { name: 'description', label: 'Descripción', type: 'textarea' },
-        { name: 'image_url', label: 'URL imagen' },
+        { name: 'image_url', label: 'Imagen', type: 'image' },
         { name: 'date', label: 'Fecha', type: 'date' },
         { name: 'time_range', label: 'Horario (11:00 – 23:00)' },
         { name: 'location', label: 'Ubicación' },

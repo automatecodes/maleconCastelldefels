@@ -143,7 +143,7 @@
 }
 .footer-col { display: flex; flex-direction: column; gap: 0; }
 .footer-brand { margin-bottom: 0.5rem; }
-.footer-logo { height: 44px; width: auto; display: block; }
+.footer-logo { height: 18px; width: auto; display: block; }
 .footer-tagline {
   color: var(--text-dim); font-size: 0.85rem; line-height: 1.55;
   margin: 0;

@@ -13,7 +13,8 @@ class Event(Base):
     name = Column(String, nullable=False)
     subtitle = Column(String, nullable=True)
     description = Column(Text, nullable=True)
-    image_url = Column(String, nullable=True)
+    image_url   = Column(String, nullable=True)
+    image_focal = Column(String, nullable=True, default="50% 50%")
     date = Column(Date, nullable=True)
     time_range = Column(String, nullable=True)   # "11:00 – 23:00"
     location = Column(String, nullable=True)

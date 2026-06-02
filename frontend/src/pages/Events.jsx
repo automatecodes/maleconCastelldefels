@@ -38,7 +38,9 @@ export default function Events() {
           {upcoming.map((e) => (
             <div key={e.id} className="card" onClick={() => setSelected(e)} style={{ cursor: 'pointer' }}>
               <div className="media-top">
-                <img src={e.image_url} alt={e.name} onError={(ev) => { ev.target.style.opacity = 0.15 }} />
+                <img src={e.image_url} alt={e.name}
+                  style={{ objectPosition: e.image_focal || '50% 50%' }}
+                  onError={(ev) => { ev.target.style.opacity = 0.15 }} />
               </div>
               <div className="card-body">
                 <span className="badge">{e.date} · {e.time_range}</span>

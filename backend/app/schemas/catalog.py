@@ -22,8 +22,9 @@ class TeacherBase(BaseModel):
     phone: str | None = None
     bio: str | None = None
     specialties: str | None = None
-    photo_url: str | None = None
-    cv_pdf_url: str | None = None
+    photo_url:   str | None = None
+    photo_focal: str | None = "50% 50%"
+    cv_pdf_url:  str | None = None
     video_url: str | None = None
     availability: str | None = None
     internal_notes: str | None = None
@@ -112,7 +113,8 @@ class EventBase(BaseModel):
     name: str
     subtitle: str | None = None
     description: str | None = None
-    image_url: str | None = None
+    image_url:   str | None = None
+    image_focal: str | None = "50% 50%"
     date: date_type | None = None
     time_range: str | None = None
     location: str | None = None

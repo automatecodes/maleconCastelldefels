@@ -15,8 +15,9 @@ class Teacher(Base):
     phone = Column(String, nullable=True)
     bio = Column(Text, nullable=True)
     specialties = Column(String, nullable=True)  # CSV: "Salsa, Bachata"
-    photo_url = Column(String, nullable=True)
-    cv_pdf_url = Column(String, nullable=True)
+    photo_url   = Column(String, nullable=True)
+    photo_focal = Column(String, nullable=True, default="50% 50%")
+    cv_pdf_url  = Column(String, nullable=True)
     video_url = Column(String, nullable=True)
     availability = Column(String, nullable=True)
     internal_notes = Column(Text, nullable=True)

@@ -50,6 +50,7 @@ export default function School() {
             <div key={tch.id} className="card teacher-card" onClick={() => setSelected(tch)}
               style={{ cursor: 'pointer' }}>
               <img className="teacher-photo" src={tch.photo_url} alt={tch.full_name}
+                style={{ objectPosition: tch.photo_focal || '50% 50%' }}
                 onError={(e) => { e.target.style.opacity = 0.2 }} />
               <div className="card-body">
                 <h4>{tch.full_name}</h4>
@@ -77,6 +78,7 @@ export default function School() {
         <Modal onClose={() => setSelected(null)}>
           <div className="modal-content">
             <img className="teacher-photo" src={selected.photo_url} alt={selected.full_name}
+              style={{ objectPosition: selected.photo_focal || '50% 50%' }}
               onError={(e) => { e.target.style.opacity = 0.2 }} />
             <h3>{selected.full_name}</h3>
             <p className="badge" style={{ margin: '0.5rem 0' }}>{selected.specialties}</p>

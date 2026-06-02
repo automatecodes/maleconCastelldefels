@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Modal from '../../components/Modal'
 import MediaPicker from './MediaPicker'
+import FocalPointPicker from './FocalPointPicker'
 
 const API = '/api/admin'
 const token = () => localStorage.getItem('token')
@@ -13,8 +14,9 @@ const EMPTY_FORM = {
   email: '',
   phone: '',
   bio: '',
-  photo_url: '',
-  cv_pdf_url: '',
+  photo_url:   '',
+  photo_focal: '50% 50%',
+  cv_pdf_url:  '',
   video_url: '',
   availability: '',
   internal_notes: '',
@@ -79,8 +81,9 @@ export default function TeachersAdmin() {
       email: teacher.email ?? '',
       phone: teacher.phone ?? '',
       bio: teacher.bio ?? '',
-      photo_url: teacher.photo_url ?? '',
-      cv_pdf_url: teacher.cv_pdf_url ?? '',
+      photo_url:   teacher.photo_url ?? '',
+      photo_focal: teacher.photo_focal ?? '50% 50%',
+      cv_pdf_url:  teacher.cv_pdf_url ?? '',
       video_url: teacher.video_url ?? '',
       availability: teacher.availability ?? '',
       internal_notes: teacher.internal_notes ?? '',
@@ -279,6 +282,15 @@ export default function TeachersAdmin() {
               <div className="field" style={{ gridColumn: '1 / -1' }}>
                 <MediaPicker label="Foto del profesor" accept="image"
                   value={form.photo_url} onChange={(url) => onChange('photo_url', url)} />
+                {form.photo_url && (
+                  <div style={{ marginTop: '0.6rem' }}>
+                    <FocalPointPicker
+                      imageSrc={form.photo_url}
+                      value={form.photo_focal}
+                      onChange={(v) => onChange('photo_focal', v)}
+                    />
+                  </div>
+                )}
               </div>
               <div className="field">
                 <MediaPicker label="CV (PDF)" accept="pdf"

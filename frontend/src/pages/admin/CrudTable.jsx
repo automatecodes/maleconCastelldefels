@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { adminGet, adminPost, adminPut, adminDelete } from '../../api/client'
 import Modal from '../../components/Modal'
 import MediaPicker from './MediaPicker'
+import FocalPointPicker from './FocalPointPicker'
 
 /**
  * Tabla CRUD genérica para el admin.
@@ -93,6 +94,12 @@ export default function CrudTable({ title, resource, columns, fields, toPayload,
                     value={form[f.name] ?? ''}
                     onChange={(url) => onChange(f.name, url)}
                     accept={f.type === 'image' ? 'image' : f.type === 'video' ? 'video' : 'any'}
+                  />
+                ) : f.type === 'focal' ? (
+                  <FocalPointPicker
+                    imageSrc={form[f.sourceField] ?? ''}
+                    value={form[f.name] ?? '50% 50%'}
+                    onChange={(v) => onChange(f.name, v)}
                   />
                 ) : (
                   <input type={f.type || 'text'} value={form[f.name] ?? ''}

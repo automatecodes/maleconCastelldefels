@@ -68,9 +68,6 @@ export default function Home() {
           <p>{t('home.heroSubtitle')}</p>
           <div className="hero-ctas">
             <Link to="/contacto" className="btn btn-primary">{t('home.ctaTrial')}</Link>
-            <a href={whatsappLink()} target="_blank" rel="noreferrer" className="btn btn-ghost">
-              {t('home.ctaWhatsapp')}
-            </a>
           </div>
         </div>
       </section>

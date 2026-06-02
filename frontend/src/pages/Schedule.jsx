@@ -416,17 +416,24 @@ export default function Schedule() {
         <p className="section-sub" style={{ marginBottom: '1.25rem' }}>{t('schedule.subtitle')}</p>
       </Reveal>
 
-      {/* Barra de controles: tabs + tipo + filtros en dos columnas */}
+      {/* Barra de controles */}
       <div className="cal-bar">
-        <div className="cal-bar-left">
-          <div className="cal-tabs">
-            <button className={view === 'semanal' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('semanal')}>
-              Vista semanal
-            </button>
-            <button className={view === 'monthly' ? 'cal-tab active' : 'cal-tab'} onClick={() => setView('monthly')}>
-              Vista mensual
-            </button>
-          </div>
+        {/* Izquierda: toggle semanal/mensual */}
+        <div className="cal-toggle">
+          <button
+            className={`cal-toggle-btn${view === 'semanal' ? ' active' : ''}`}
+            onClick={() => setView('semanal')}>
+            Semana
+          </button>
+          <button
+            className={`cal-toggle-btn${view === 'monthly' ? ' active' : ''}`}
+            onClick={() => setView('monthly')}>
+            Mes
+          </button>
+        </div>
+
+        {/* Derecha: Clases / Eventos + filtros */}
+        <div className="cal-bar-right">
           <div className="cal-type-pills">
             <button
               className={`cal-pill cal-pill--course${filterType === 'courses' ? ' active' : ''}`}
@@ -439,21 +446,20 @@ export default function Schedule() {
               🎉 Eventos
             </button>
           </div>
+          {filterType !== 'events' && (
+            <>
+              <span className="cal-filter-label">Filtros</span>
+              <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
+                <option value="">Todos los cursos</option>
+                {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+              <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
+                <option value="">Todos los profesores</option>
+                {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
+              </select>
+            </>
+          )}
         </div>
-
-        {filterType !== 'events' && (
-          <div className="cal-bar-right">
-            <span className="cal-filter-label">Filtros</span>
-            <select value={filterCourse} onChange={(e) => setFilterCourse(e.target.value)}>
-              <option value="">Todos los cursos</option>
-              {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <select value={filterTeacher} onChange={(e) => setFilterTeacher(e.target.value)}>
-              <option value="">Todos los profesores</option>
-              {allTeachers.map((tc) => <option key={tc.id} value={tc.id}>{tc.full_name}</option>)}
-            </select>
-          </div>
-        )}
       </div>
 
       {view === 'semanal' && <WeekView />}

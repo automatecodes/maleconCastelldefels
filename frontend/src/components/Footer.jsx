@@ -84,7 +84,10 @@ export default function Footer() {
 
         {/* Col 1 — Marca */}
         <div className="footer-col">
-          <div className="footer-brand">el<span className="accent">Malecón</span></div>
+          <div className="footer-brand">
+            <img src="/logo.png" alt="elMalecón" className="footer-logo"
+              onError={(e) => { e.target.style.display = 'none' }} />
+          </div>
           <p className="footer-tagline">
             Escuela de baile latino con alma cubana en Castelldefels.<br />
             Salsa, bachata, son, merengue y más.

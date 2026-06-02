@@ -122,7 +122,7 @@ export default function Home() {
         <div className="grid grid-3">
           {courses.map((c) => <Reveal key={c.id}><CourseCard course={c} /></Reveal>)}
         </div>
-        <div style={{ marginTop: '1.5rem' }}>
+        <div style={{ marginTop: '1rem' }}>
           <Link to="/cursos" className="btn btn-ghost">{t('common.viewMore')}</Link>
         </div>
       </section>
@@ -156,7 +156,7 @@ export default function Home() {
       {/* Club social */}
       <section className="section container">
         <Reveal>
-          <div className="card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+          <div className="card" style={{ padding: '1.75rem', textAlign: 'center' }}>
             <h2 className="section-title">{t('home.clubTitle')}</h2>
             <p className="section-sub" style={{ margin: '1rem auto 0' }}>{t('home.clubText')}</p>
           </div>

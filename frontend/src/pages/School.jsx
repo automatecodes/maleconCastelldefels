@@ -28,7 +28,7 @@ export default function School() {
 
       {/* Historia y filosofía */}
       <Reveal>
-        <div className="grid grid-2" style={{ alignItems: 'center', marginBottom: '3rem' }}>
+        <div className="grid grid-2" style={{ alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
             <h3 style={{ marginBottom: '1rem' }}>{t('school.history')}</h3>
             <p className="tag-dim">{t('school.historyText')}</p>
@@ -41,7 +41,7 @@ export default function School() {
       </Reveal>
 
       {/* Profesores: fichas */}
-      <Reveal className="section">
+      <Reveal className="subsection">
         <h3 style={{ marginBottom: '0.5rem' }}>{t('school.teachers')}</h3>
         <p className="section-sub">{t('school.teachersSub')}</p>
 

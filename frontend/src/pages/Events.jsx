@@ -53,7 +53,7 @@ export default function Events() {
 
       {/* Galería histórica */}
       {galleryPhotos.length > 0 && (
-        <Reveal className="section">
+        <Reveal className="subsection">
           <h3 style={{ marginBottom: '1rem' }}>{t('events.gallery')}</h3>
           <div className="collage">
             {galleryPhotos.map((p) => (
@@ -66,7 +66,7 @@ export default function Events() {
 
       {/* Noticias: feed de redes */}
       {social.length > 0 && (
-        <Reveal className="section">
+        <Reveal className="subsection">
           <h3 style={{ marginBottom: '0.5rem' }}>{t('events.news')}</h3>
           <p className="section-sub">{t('events.newsSub')}</p>
           <SocialFeed posts={social} />

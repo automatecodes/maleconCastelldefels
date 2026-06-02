@@ -57,7 +57,7 @@
 }
 
 /* ---------- Hero ---------- */
-.hero { position: relative; min-height: 86vh; display: flex; align-items: center; overflow: hidden; }
+.hero { position: relative; min-height: 78vh; display: flex; align-items: center; overflow: hidden; }
 .hero-video {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;
 }
@@ -72,11 +72,11 @@
 .hero-dim    { position: absolute; inset: 0; background: #000; z-index: -1; pointer-events: none; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,14,11,0.55), rgba(10,14,11,0.92)); z-index: -1; pointer-events: none; }
 .hero-content { max-width: 720px; }
-.hero h1 { margin-bottom: 1.2rem; }
+.hero h1 { margin-bottom: 0.75rem; }
 .hero h1 .accent { text-shadow: var(--glow); }
-.hero p { font-size: 1.2rem; color: var(--text); margin-bottom: 2rem; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
-.pill-tag { display: inline-block; margin-bottom: 1.2rem; }
+.hero p { font-size: 1.15rem; color: var(--text); margin-bottom: 1.5rem; }
+.hero-ctas { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.pill-tag { display: inline-block; margin-bottom: 0.75rem; }
 
 /* ---------- Cards de curso / evento / profesor ---------- */
 .media-top { aspect-ratio: 16/10; background: var(--surface-2); position: relative; overflow: hidden; }
@@ -88,8 +88,8 @@
 .price-big { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: var(--green); }
 
 .teacher-card { text-align: center; }
-.teacher-photo { aspect-ratio: 1; border-radius: 50%; width: 130px; margin: 1.25rem auto 0.5rem; object-fit: cover; background: var(--surface-2); border: 2px solid var(--border); }
-.collage { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 2rem; }
+.teacher-photo { aspect-ratio: 1; border-radius: 50%; width: 120px; margin: 1rem auto 0.4rem; object-fit: cover; background: var(--surface-2); border: 2px solid var(--border); }
+.collage { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 1.25rem; }
 .collage img { aspect-ratio: 1; object-fit: cover; border-radius: 10px; cursor: pointer; transition: all 0.25s; background: var(--surface-2); }
 .collage img:hover { box-shadow: var(--glow); transform: scale(1.04); }
 

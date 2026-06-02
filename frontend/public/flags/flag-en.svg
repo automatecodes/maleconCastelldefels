@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <defs>
+    <clipPath id="c"><circle cx="30" cy="30" r="30"/></clipPath>
+  </defs>
+  <g clip-path="url(#c)">
+    <!-- Blue background -->
+    <rect width="60" height="60" fill="#012169"/>
+
+    <!-- St Andrew (white X diagonals) -->
+    <line x1="0" y1="0" x2="60" y2="60" stroke="white" stroke-width="12"/>
+    <line x1="60" y1="0" x2="0" y2="60" stroke="white" stroke-width="12"/>
+
+    <!-- St Patrick fimbriation (red diagonals, counter-changed) -->
+    <!-- upper-right triangle -->
+    <polygon points="33,0 60,0 60,27" fill="#C8102E"/>
+    <!-- lower-left triangle -->
+    <polygon points="0,33 0,60 27,60" fill="#C8102E"/>
+    <!-- upper-left triangle -->
+    <polygon points="27,0 0,0 0,27" fill="#C8102E"/>
+    <!-- lower-right triangle -->
+    <polygon points="33,60 60,60 60,33" fill="#C8102E"/>
+
+    <!-- St George (white cross fimbriation) -->
+    <rect x="24" y="0" width="12" height="60" fill="white"/>
+    <rect x="0" y="24" width="60" height="12" fill="white"/>
+
+    <!-- St George (red cross center) -->
+    <rect x="26" y="0" width="8" height="60" fill="#C8102E"/>
+    <rect x="0" y="26" width="60" height="8" fill="#C8102E"/>
+  </g>
+</svg>

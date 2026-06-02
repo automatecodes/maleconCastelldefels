@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const LANGS = [
-  { code: 'es', flag: '🇪🇸', label: 'Español' },
-  { code: 'ca', flag: '🏴󠁥󠁳󠁣󠁴󠁿', label: 'Català' },
-  { code: 'en', flag: '🇬🇧', label: 'English' },
+  { code: 'es', flag: '/flags/flag-es.svg', label: 'Español' },
+  { code: 'ca', flag: '/flags/flag-ca.svg', label: 'Català' },
+  { code: 'en', flag: '/flags/flag-en.svg', label: 'English' },
 ]
 
 export default function LanguageSelector() {
@@ -30,7 +30,7 @@ export default function LanguageSelector() {
   return (
     <div className="lang-selector" ref={ref}>
       <button className="lang-trigger" onClick={() => setOpen(!open)} aria-label="Seleccionar idioma">
-        <span>{current.flag}</span>
+        <img src={current.flag} alt={current.code} className="lang-flag" />
         <span className="lang-code">{current.code.toUpperCase()}</span>
         <span className={`lang-arrow ${open ? 'open' : ''}`}>▾</span>
       </button>
@@ -43,7 +43,7 @@ export default function LanguageSelector() {
               className={`lang-option${l.code === i18n.language ? ' active' : ''}`}
               onClick={() => change(l.code)}
             >
-              <span>{l.flag}</span>
+              <img src={l.flag} alt={l.code} className="lang-flag" />
               <span>{l.label}</span>
             </button>
           ))}

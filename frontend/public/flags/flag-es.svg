@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <defs>
+    <clipPath id="c"><circle cx="30" cy="30" r="30"/></clipPath>
+  </defs>
+  <g clip-path="url(#c)">
+    <!-- Rojo superior -->
+    <rect width="60" height="15" fill="#C60B1E"/>
+    <!-- Amarillo central (doble altura) -->
+    <rect y="15" width="60" height="30" fill="#FFC400"/>
+    <!-- Rojo inferior -->
+    <rect y="45" width="60" height="15" fill="#C60B1E"/>
+
+    <!-- Escudo simplificado (franja amarilla + corona) -->
+    <!-- Pilares de Hércules: izquierdo -->
+    <rect x="16" y="22" width="5" height="16" fill="#C60B1E" rx="1"/>
+    <rect x="15" y="20" width="7" height="3" fill="#C60B1E" rx="1"/>
+    <!-- Pilares de Hércules: derecho -->
+    <rect x="39" y="22" width="5" height="16" fill="#C60B1E" rx="1"/>
+    <rect x="38" y="20" width="7" height="3" fill="#C60B1E" rx="1"/>
+
+    <!-- Escudo central -->
+    <rect x="23" y="21" width="14" height="18" fill="#C60B1E" rx="2"/>
+    <rect x="24" y="22" width="6" height="8" fill="#FFC400"/>
+    <rect x="30" y="22" width="6" height="8" fill="#C60B1E"/>
+    <rect x="24" y="30" width="6" height="8" fill="#C60B1E"/>
+    <rect x="30" y="30" width="6" height="8" fill="#FFC400"/>
+
+    <!-- Corona -->
+    <rect x="25" y="18" width="10" height="3" fill="#C60B1E" rx="1"/>
+    <rect x="27" y="15" width="2" height="3" fill="#C60B1E"/>
+    <rect x="31" y="15" width="2" height="3" fill="#C60B1E"/>
+    <rect x="29" y="14" width="2" height="2" fill="#C60B1E"/>
+  </g>
+</svg>

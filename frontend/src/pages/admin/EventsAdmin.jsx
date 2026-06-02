@@ -3,7 +3,7 @@ import AiImageButton from './AiImageButton'
 import { generateEventImage } from '../../api/client'
 
 const statusStyle = (s) => {
-  if (s === 'próximo') return { background: 'rgba(113,230,40,0.18)', color: '#71e628' }
+  if (s === 'próximo') return { background: 'rgba(82,196,26,0.18)', color: '#52C41A' }
   return { background: 'rgba(120,120,120,0.18)', color: '#888' }
 }
 

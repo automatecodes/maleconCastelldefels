@@ -6,12 +6,12 @@
   --surface:    #121814;
   --surface-2:  #161d18;
   --border:     #1E2622;
-  --green:      #71e628;
-  --green-hover:#60c422;
+  --green:      #52C41A;
+  --green-hover:#45A616;
   --amber:      #F59E0B;
   --text:       #F4F7F4;
   --text-dim:   #9AA39C;
-  --glow: 0 0 0.5rem rgba(113,230,40,0.55), 0 0 1.5rem rgba(113,230,40,0.25);
+  --glow: 0 0 0.5rem rgba(82,196,26,0.55), 0 0 1.5rem rgba(82,196,26,0.25);
   --radius: 14px;
   --font-head: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;

@@ -42,8 +42,8 @@
   padding: 0.55rem 1rem; cursor: pointer; font-size: 0.88rem; text-align: left;
   transition: background 0.15s, color 0.15s;
 }
-.lang-option:hover { background: rgba(113,230,40,0.08); color: var(--text); }
-.lang-option.active { color: var(--green); background: rgba(113,230,40,0.12); }
+.lang-option:hover { background: rgba(82,196,26,0.08); color: var(--text); }
+.lang-option.active { color: var(--green); background: rgba(82,196,26,0.12); }
 .lang-option .lang-flag { width: 22px; height: 22px; }
 
 @media (max-width: 860px) {
@@ -65,7 +65,7 @@
   /* Siempre visible como fondo base; queda DEBAJO del vídeo */
   position: absolute; inset: 0; z-index: -3;
   background:
-    radial-gradient(circle at 20% 30%, rgba(113,230,40,0.18), transparent 45%),
+    radial-gradient(circle at 20% 30%, rgba(82,196,26,0.18), transparent 45%),
     radial-gradient(circle at 80% 70%, rgba(245,158,11,0.12), transparent 45%),
     var(--bg);
 }
@@ -297,7 +297,7 @@
 .month-num { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 0.3rem; }
 .month-num--today {
   color: var(--green); font-weight: 800;
-  background: rgba(113,230,40,0.15); border-radius: 4px;
+  background: rgba(82,196,26,0.15); border-radius: 4px;
   display: inline-block; padding: 0 0.25rem;
 }
 .month-dot {

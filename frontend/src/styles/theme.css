@@ -17,6 +17,13 @@
 
   --font-head: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Componentes estructurales tematizables */
+  --header-bg:         rgba(10, 14, 11, 0.88);
+  --header-border:     var(--border);
+  --hero-overlay:      linear-gradient(180deg, rgba(10,14,11,0.50), rgba(10,14,11,0.92));
+  --footer-bg:         var(--surface);
+  --footer-border:     var(--border);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

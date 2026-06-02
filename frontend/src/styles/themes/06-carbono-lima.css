@@ -1,115 +1,39 @@
 /* ══════════════════════════════════════════════════════
-   CARBONO LIMA — Grafito oscuro · Lima eléctrica
-   Energía de gym/estudio moderno, contraste brutal
+   CARBONO LIMA — Grafito · Fibra de carbono · Lima eléctrica
    ══════════════════════════════════════════════════════ */
 :root {
   --bg:         #141414;
   --surface:    #1C1C1C;
   --surface-2:  #242424;
   --border:     #303030;
-  --green:      #AEEA00;        /* lima chartreuse eléctrico */
+  --green:      #AEEA00;
   --green-hover:#9DCB00;
-  --amber:      #FF6D00;        /* naranja energía */
+  --amber:      #FF6D00;
   --text:       #F5F5F5;
   --text-dim:   #9E9E9E;
   --glow: 0 0 8px rgba(174,234,0,0.7), 0 0 24px rgba(174,234,0,0.25);
   --radius: 10px;
-  --font-head: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-head: 'Space Grotesk',system-ui,sans-serif;
+  --font-body: 'Inter',system-ui,sans-serif;
+  --header-bg:     rgba(20,20,20,0.95);
+  --header-border: #303030;
+  --hero-overlay:  linear-gradient(180deg, rgba(14,14,14,0.45), rgba(14,14,14,0.92));
+  --footer-bg:     #1C1C1C;
+  --footer-border: #303030;
 }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  /* Textura de fibra de carbono CSS */
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
-      transparent 1px, transparent 8px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
-      transparent 1px, transparent 8px
-    );
-}
-
-/* Heading con acento lima en la primera línea */
-.section-title::before {
-  content: '▸ ';
-  color: var(--green);
-  font-size: 0.7em;
-}
-
-/* Acento: gradiente lima→blanco */
-.accent {
-  background: linear-gradient(135deg, var(--green) 30%, #E8F5E9);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Botones: lima neon con sombra dura */
-.btn-primary {
-  background: var(--green);
-  color: #141414;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  box-shadow: 4px 4px 0 rgba(174,234,0,0.3);
-}
-.btn-primary:hover {
-  background: var(--green-hover);
-  box-shadow: 6px 6px 0 rgba(174,234,0,0.4), 0 0 20px rgba(174,234,0,0.3);
-  transform: translate(-2px, -2px);
-}
-.btn-ghost {
-  border-color: var(--border);
-  color: var(--text-dim);
-}
-.btn-ghost:hover {
-  border-color: var(--green);
-  color: var(--green);
-  box-shadow: 0 0 8px rgba(174,234,0,0.2);
-}
-
-/* Tarjetas: borde superior lima en hover */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  border-top: 2px solid transparent;
-  transition: border-top-color 0.25s, box-shadow 0.25s, transform 0.25s;
-}
-.card:hover {
-  border-top-color: var(--green);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(174,234,0,0.06);
-  transform: translateY(-4px);
-}
-
-/* Imágenes: desaturado a color lima en hover */
-.media-top img, .card img:not(.lang-flag):not(.sch-cell-thumb) {
-  filter: saturate(0.7) brightness(0.9);
-  transition: filter 0.4s;
-}
-.media-top:hover img, .card:hover img:not(.lang-flag):not(.sch-cell-thumb) {
-  filter: saturate(1.15) brightness(1.05) contrast(1.05);
-}
-
-/* Badge lima */
-.badge {
-  background: rgba(174,234,0,0.1);
-  border: 1px solid rgba(174,234,0,0.35);
-  color: var(--green);
-}
-
-/* Inputs con fondo carbono */
-input, select, textarea {
-  background: var(--surface-2);
-  border-color: var(--border);
-  color: var(--text);
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(174,234,0,0.12);
-}
+body { background:var(--bg); color:var(--text); background-image: repeating-linear-gradient(45deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 8px), repeating-linear-gradient(-45deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 8px); }
+.section-title::before { content:'▸ '; color:var(--green); font-size:0.7em; }
+.accent { background:linear-gradient(135deg,var(--green) 30%,#E8F5E9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.nav-link { color:var(--text-dim); }
+.nav-link:hover,.nav-link.active { color:var(--green); }
+.btn-primary { background:var(--green); color:#141414; font-weight:700; letter-spacing:0.04em; box-shadow:4px 4px 0 rgba(174,234,0,0.3); }
+.btn-primary:hover { background:var(--green-hover); box-shadow:6px 6px 0 rgba(174,234,0,0.4),0 0 20px rgba(174,234,0,0.3); transform:translate(-2px,-2px); }
+.btn-ghost { border-color:var(--border); color:var(--text-dim); }
+.btn-ghost:hover { border-color:var(--green); color:var(--green); box-shadow:0 0 8px rgba(174,234,0,0.2); }
+.card { background:var(--surface); border:1px solid var(--border); border-top:2px solid transparent; transition:border-top-color 0.25s,box-shadow 0.25s,transform 0.25s; }
+.card:hover { border-top-color:var(--green); box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(174,234,0,0.06); transform:translateY(-4px); }
+.media-top img,.card img:not(.lang-flag):not(.sch-cell-thumb) { filter:saturate(0.7) brightness(0.9); transition:filter 0.4s; }
+.media-top:hover img,.card:hover img:not(.lang-flag):not(.sch-cell-thumb) { filter:saturate(1.15) brightness(1.05) contrast(1.05); }
+.badge { background:rgba(174,234,0,0.10); border:1px solid rgba(174,234,0,0.35); color:var(--green); }
+input,select,textarea { background:var(--surface-2); border-color:var(--border); color:var(--text); }
+input:focus,select:focus,textarea:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(174,234,0,0.12); }

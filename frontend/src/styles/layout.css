@@ -1,8 +1,8 @@
 /* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(10, 14, 11, 0.82); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: var(--header-bg); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--header-border);
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
 .brand { display: flex; align-items: center; gap: 0.6rem; }
@@ -70,7 +70,7 @@
     var(--bg);
 }
 .hero-dim    { position: absolute; inset: 0; background: #000; z-index: -1; pointer-events: none; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,14,11,0.55), rgba(10,14,11,0.92)); z-index: -1; pointer-events: none; }
+.hero-overlay { position: absolute; inset: 0; background: var(--hero-overlay); z-index: -1; pointer-events: none; }
 .hero-content { max-width: 720px; }
 .hero h1 { margin-bottom: 0.75rem; }
 .hero h1 .accent { text-shadow: var(--glow); }
@@ -130,8 +130,8 @@
 
 /* ---------- Footer ---------- */
 .site-footer {
-  border-top: 1px solid var(--border);
-  background: var(--surface);
+  border-top: 1px solid var(--footer-border);
+  background: var(--footer-bg);
   margin-top: 2rem;
   padding: 2rem 0 0;
 }

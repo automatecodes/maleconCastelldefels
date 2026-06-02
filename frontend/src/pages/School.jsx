@@ -40,25 +40,10 @@ export default function School() {
         </div>
       </Reveal>
 
-      {/* Instalaciones */}
-      <Reveal>
-        <h3 style={{ marginBottom: '0.5rem' }}>{t('school.facilities')}</h3>
-        <p className="section-sub">{t('school.facilitiesSub')}</p>
-        <Carousel images={FACILITY_IMAGES} onImageClick={setLightbox} />
-      </Reveal>
-
-      {/* Profesores: collage + fichas */}
+      {/* Profesores: fichas */}
       <Reveal className="section">
         <h3 style={{ marginBottom: '0.5rem' }}>{t('school.teachers')}</h3>
         <p className="section-sub">{t('school.teachersSub')}</p>
-
-        <div className="collage">
-          {teachers.map((tch) => (
-            <img key={tch.id} src={tch.photo_url} alt={tch.full_name}
-              onClick={() => setSelected(tch)}
-              onError={(e) => { e.target.style.opacity = 0.2 }} />
-          ))}
-        </div>
 
         <div className="grid grid-4">
           {teachers.map((tch) => (
@@ -73,6 +58,13 @@ export default function School() {
             </div>
           ))}
         </div>
+      </Reveal>
+
+      {/* Instalaciones */}
+      <Reveal>
+        <h3 style={{ marginBottom: '0.5rem' }}>{t('school.facilities')}</h3>
+        <p className="section-sub">{t('school.facilitiesSub')}</p>
+        <Carousel images={FACILITY_IMAGES} onImageClick={setLightbox} />
       </Reveal>
 
       {lightbox && (

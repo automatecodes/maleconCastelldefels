@@ -136,6 +136,27 @@ Rutas:
 - Media: `GET /api/admin/media/list?folder=` → list | `POST /upload` | `DELETE /delete?path=` | `GET/PUT /metadata`
 - Templates: `GET /api/admin/themes/export` → JSON | `POST /api/admin/themes/import` | `PUT /api/admin/themes/variables`
 
+## Flujo de trabajo obligatorio antes de `git push`
+
+**NUNCA hacer push sin antes:**
+
+1. Parar y limpiar el entorno Docker:
+
+   ```bash
+   docker compose stop
+   docker system prune -f
+   docker network create proxyNet   # ignora error si ya existe
+   docker compose -f docker-compose.yml -f dev.yml up --build -d
+   ```
+
+2. Verificar que el entorno arranca sin errores (`docker compose logs api --tail=20`)
+3. **Preguntar al usuario: "¿Está todo bien? ¿Hago el push?"**
+4. Solo ejecutar `git push` con confirmación explícita del usuario.
+
+> Nota: los pasos 1-4 ya se ejecutan automáticamente en el hook post-commit (`.git/hooks/post-commit`). El paso pendiente antes del push es la confirmación del usuario.
+
+---
+
 ## Estado del proyecto (junio 2026)
 
 - [x] Backend completo con todos los módulos

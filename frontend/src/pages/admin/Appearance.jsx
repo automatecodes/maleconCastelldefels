@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { adminGetThemes, adminSetTheme } from '../../api/client'
+import { adminGetThemes, adminSetTheme, adminGetVideoSettings, adminSetVideoSettings } from '../../api/client'
 
 const TOKEN = () => localStorage.getItem('token')
 const AUTH = () => ({ Authorization: `Bearer ${TOKEN()}` })
@@ -22,6 +22,11 @@ export default function Appearance() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
 
+  // Vídeo hero
+  const [videoSt, setVideoSt] = useState({ overlay: 0.05, speed: 1.0 })
+  const [videoMsg, setVideoMsg] = useState('')
+  const [videoSaving, setVideoSaving] = useState(false)
+
   // Template variables
   const [vars, setVars] = useState({})
   const [varsLoading, setVarsLoading] = useState(false)
@@ -37,6 +42,23 @@ export default function Appearance() {
       .then((d) => { setThemes(d.themes); setActive(d.active) })
       .catch(() => setMsg(t('appearance.error')))
   }, [t])
+
+  useEffect(() => {
+    adminGetVideoSettings().then(setVideoSt).catch(() => {})
+  }, [])
+
+  const saveVideo = async () => {
+    setVideoSaving(true)
+    setVideoMsg('')
+    try {
+      await adminSetVideoSettings(videoSt)
+      setVideoMsg('Guardado correctamente')
+    } catch {
+      setVideoMsg('Error al guardar')
+    } finally {
+      setVideoSaving(false)
+    }
+  }
 
   useEffect(() => {
     setVarsLoading(true)
@@ -224,6 +246,48 @@ export default function Appearance() {
         {importMsg && (
           <p className="tag-dim" style={{ marginTop: '0.75rem' }}>{importMsg}</p>
         )}
+      </div>
+
+      {/* Vídeo Hero */}
+      <div className="card card-body" style={{ maxWidth: 560, marginBottom: '1.5rem' }}>
+        <h3 style={{ marginBottom: '1.25rem' }}>🎬 Vídeo Hero</h3>
+
+        <div className="field">
+          <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Capa de atenuación</span>
+            <strong style={{ color: 'var(--green)' }}>{Math.round(videoSt.overlay * 100)}%</strong>
+          </label>
+          <input type="range" min="0" max="1" step="0.01"
+            value={videoSt.overlay}
+            onChange={(e) => setVideoSt((s) => ({ ...s, overlay: parseFloat(e.target.value) }))}
+            style={{ width: '100%', accentColor: 'var(--green)' }}
+          />
+          <p className="tag-dim" style={{ fontSize: '0.8rem', marginTop: '0.35rem' }}>
+            Capa negra semitransparente sobre el vídeo (0 = sin atenuación, 100 = negro total)
+          </p>
+        </div>
+
+        <div className="field" style={{ marginTop: '1rem' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Velocidad de reproducción</span>
+            <strong style={{ color: 'var(--green)' }}>{videoSt.speed.toFixed(2)}×</strong>
+          </label>
+          <input type="range" min="0.25" max="2" step="0.05"
+            value={videoSt.speed}
+            onChange={(e) => setVideoSt((s) => ({ ...s, speed: parseFloat(e.target.value) }))}
+            style={{ width: '100%', accentColor: 'var(--green)' }}
+          />
+          <p className="tag-dim" style={{ fontSize: '0.8rem', marginTop: '0.35rem' }}>
+            0.25× (muy lento) → 1× (normal) → 2× (rápido)
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '1.25rem' }}>
+          <button className="btn btn-primary" onClick={saveVideo} disabled={videoSaving}>
+            {videoSaving ? 'Guardando…' : 'Guardar configuración de vídeo'}
+          </button>
+          {videoMsg && <span className="tag-dim">{videoMsg}</span>}
+        </div>
       </div>
     </div>
   )

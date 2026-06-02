@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getCourses, getEvents, getSocial } from '../api/client'
+import { getCourses, getEvents, getSocial, getVideoSettings } from '../api/client'
 import { whatsappLink } from '../components/WhatsAppButton'
 import Reveal from '../components/Reveal'
 import SocialFeed from '../components/SocialFeed'
@@ -14,6 +14,8 @@ export default function Home() {
   const [allCourses, setAllCourses] = useState([])
   const [events, setEvents] = useState([])
   const [social, setSocial] = useState([])
+  const [videoSettings, setVideoSettings] = useState({ overlay: 0.05, speed: 1.0 })
+  const videoRef = useRef(null)
 
   useEffect(() => {
     getCourses().then((c) => {
@@ -22,7 +24,30 @@ export default function Home() {
     }).catch(() => {})
     getEvents().then((e) => setEvents(e.filter((x) => x.computed_status === 'próximo').slice(0, 2))).catch(() => {})
     getSocial().then((s) => setSocial(s.slice(0, 4))).catch(() => {})
+    getVideoSettings().then(setVideoSettings).catch(() => {})
   }, [])
+
+  // Carga diferida del vídeo: la página pinta primero, el vídeo llega después
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    const load = () => {
+      video.src = salsaVideo
+      video.load()
+      video.play().catch(() => {})
+    }
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(load, { timeout: 2000 })
+    } else {
+      setTimeout(load, 200)
+    }
+  }, [])
+
+  // Aplica velocidad cuando el vídeo ya tiene src
+  useEffect(() => {
+    const video = videoRef.current
+    if (video) video.playbackRate = videoSettings.speed
+  }, [videoSettings.speed])
 
   const proximaApertura = allCourses.filter((c) => c.status === 'próxima apertura')
 
@@ -30,11 +55,11 @@ export default function Home() {
     <>
       {/* Hero con vídeo de fondo */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline
-          onError={(e) => { e.target.style.display = 'none' }}>
-          <source src={salsaVideo} type="video/mp4" />
-        </video>
+        {/* Sin src inicial — se asigna en useEffect para no bloquear el LCP */}
+        <video ref={videoRef} className="hero-video" muted loop playsInline
+          onError={(e) => { e.target.style.display = 'none' }} />
         <div className="hero-fallback" />
+        <div className="hero-dim" style={{ opacity: videoSettings.overlay }} />
         <div className="hero-overlay" />
         <div className="container hero-content">
           <span className="badge pill-tag">🌴 {t('common.noPartner')}</span>

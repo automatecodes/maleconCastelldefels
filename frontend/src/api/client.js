@@ -44,4 +44,9 @@ export const imageStatus = () => api.get('/admin/images/status').then((r) => r.d
 export const generateCourseImage = (id) => api.post(`/admin/images/course/${id}`).then((r) => r.data)
 export const generateEventImage = (id) => api.post(`/admin/images/event/${id}`).then((r) => r.data)
 
+// Configuración de vídeo hero
+export const getVideoSettings  = () => api.get('/public/video-settings').then((r) => r.data)
+export const adminGetVideoSettings = () => api.get('/admin/video').then((r) => r.data)
+export const adminSetVideoSettings = (data) => api.put('/admin/video', data).then((r) => r.data)
+
 export default api

@@ -10,7 +10,7 @@ from app.core.database import Base, engine
 import app.models  # noqa: F401  (registra todas las tablas)
 from app.routers import (
     auth, public, students, teachers, courses, events, leads, enrollments,
-    stats, media, images, themes,
+    stats, media, images, themes, video_settings,
 )
 
 app = FastAPI(title="El Malecón de la Salsa — API", version="1.0.0")
@@ -40,8 +40,9 @@ if os.path.isdir(settings.MEDIA_ROOT):
     app.mount("/media", StaticFiles(directory=settings.MEDIA_ROOT), name="media")
 
 for r in (auth, public, students, teachers, courses, events, leads, enrollments,
-          stats, media, images, themes):
+          stats, media, images, themes, video_settings):
     app.include_router(r.router)
 
-# Endpoints públicos del tema activo (/api/public/theme, /api/public/theme.css)
+# Endpoints públicos
 app.include_router(themes.public_router)
+app.include_router(video_settings.public_router)

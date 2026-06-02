@@ -25,8 +25,14 @@ def _with_computed_status(event: Event) -> dict:
 
 @router.get("")
 def list_events(db: Session = Depends(get_db)):
-    events = db.query(Event).order_by(Event.date.desc()).all()
-    return [_with_computed_status(e) for e in events]
+    today = date.today()
+    upcoming = db.query(Event).filter(
+        (Event.date == None) | (Event.date >= today)  # noqa: E711
+    ).order_by(Event.date.asc()).all()
+    past = db.query(Event).filter(
+        Event.date != None, Event.date < today  # noqa: E711
+    ).order_by(Event.date.desc()).all()
+    return [_with_computed_status(e) for e in upcoming + past]
 
 
 @router.post("", status_code=201)

@@ -63,11 +63,19 @@ def schedule(db: Session = Depends(get_db)):
 @router.get("/events")
 def list_events(db: Session = Depends(get_db)):
     from datetime import date
-    events = db.query(Event).order_by(Event.date.desc()).all()
+    today = date.today()
+    # Próximos: ascendente (el más cercano primero)
+    upcoming = db.query(Event).filter(
+        (Event.date == None) | (Event.date >= today)  # noqa: E711
+    ).order_by(Event.date.asc()).all()
+    # Pasados: descendente (el más reciente primero)
+    past = db.query(Event).filter(
+        Event.date != None, Event.date < today  # noqa: E711
+    ).order_by(Event.date.desc()).all()
     result = []
-    for e in events:
+    for e in upcoming + past:
         d = EventOut.model_validate(e).model_dump()
-        d["computed_status"] = "histórico" if (e.date and e.date < date.today()) else "próximo"
+        d["computed_status"] = "histórico" if (e.date and e.date < today) else "próximo"
         result.append(d)
     return result
 

@@ -18,9 +18,8 @@ export default function Events() {
     getSocial().then(setSocial).catch(() => {})
   }, [])
 
-  const today = new Date().toISOString().slice(0, 10)
-  const upcoming = events.filter((e) => e.status !== 'pasado' && (!e.date || e.date >= today))
-  const past = events.filter((e) => e.status === 'pasado' || (e.date && e.date < today))
+  const upcoming = events.filter((e) => e.computed_status === 'próximo')
+  const past = events.filter((e) => e.computed_status === 'histórico')
   const galleryPhotos = past.flatMap((e) => e.photos).concat(
     upcoming.flatMap((e) => e.photos) // muestra galerías de ediciones anteriores también
   )

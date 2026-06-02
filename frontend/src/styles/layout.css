@@ -319,6 +319,29 @@
 .sch-info-label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 .sch-prices { margin-top: 1.5rem; }
 
+/* Detail modal: info izquierda + imagen principal derecha */
+.detail-modal { padding: 0 0.25rem 0.5rem; }
+.detail-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1rem 1.25rem 1.25rem;
+}
+.detail-modal-info { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.detail-modal-image {
+  position: sticky; top: 0;
+  aspect-ratio: 3/4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+  .detail-modal-grid { grid-template-columns: 1fr; }
+  .detail-modal-image { aspect-ratio: 16/9; position: static; order: -1; }
+}
+
 /* Modal split: imagen izquierda + detalles derecha */
 .modal-split {
   display: flex; min-height: 340px;

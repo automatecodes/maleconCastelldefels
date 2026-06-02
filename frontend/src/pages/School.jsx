@@ -4,6 +4,7 @@ import { getTeachers } from '../api/client'
 import Reveal from '../components/Reveal'
 import Carousel from '../components/Carousel'
 import Modal from '../components/Modal'
+import DetailModal from '../components/DetailModal'
 
 const FACILITY_IMAGES = [
   '/media/escuela/instalacion1.jpg',
@@ -75,28 +76,25 @@ export default function School() {
       )}
 
       {selected && (
-        <Modal onClose={() => setSelected(null)}>
-          <div className="modal-content">
-            <img className="teacher-photo" src={selected.photo_url} alt={selected.full_name}
-              style={{ objectPosition: selected.photo_focal || '50% 50%' }}
-              onError={(e) => { e.target.style.opacity = 0.2 }} />
-            <h3>{selected.full_name}</h3>
-            <p className="badge" style={{ margin: '0.5rem 0' }}>{selected.specialties}</p>
-            <p className="tag-dim">{selected.bio}</p>
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
-              {selected.cv_pdf_url && (
-                <a className="btn btn-ghost" href={selected.cv_pdf_url} target="_blank" rel="noreferrer">
-                  {t('common.viewCv')}
-                </a>
-              )}
-              {selected.video_url && (
-                <a className="btn btn-ghost" href={selected.video_url} target="_blank" rel="noreferrer">
-                  🎬 Vídeo
-                </a>
-              )}
-            </div>
-          </div>
-        </Modal>
+        <DetailModal
+          onClose={() => setSelected(null)}
+          mainImage={selected.photo_url}
+          mainImageFocal={selected.photo_focal}
+          videoUrl={selected.video_url}
+          extraImages={selected.extra_images}
+        >
+          <h3 style={{ marginBottom: '0.25rem' }}>{selected.full_name}</h3>
+          {selected.specialties && (
+            <p className="badge" style={{ marginBottom: '0.75rem', display: 'inline-block' }}>{selected.specialties}</p>
+          )}
+          {selected.bio && <p className="tag-dim" style={{ lineHeight: 1.6 }}>{selected.bio}</p>}
+          {selected.cv_pdf_url && (
+            <a className="btn btn-ghost" style={{ marginTop: '1rem', display: 'inline-flex' }}
+              href={selected.cv_pdf_url} target="_blank" rel="noreferrer">
+              {t('common.viewCv')}
+            </a>
+          )}
+        </DetailModal>
       )}
     </div>
   )

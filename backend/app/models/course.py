@@ -24,8 +24,10 @@ class Course(Base):
     style = Column(String, nullable=True)          # categoría/estilo
     description = Column(Text, nullable=True)
     image_url = Column(String, nullable=True)
-    video_url = Column(String, nullable=True)
-    calendar_color = Column(String, default="#2FE56B", nullable=False)
+    video_url    = Column(String, nullable=True)
+    extra_images = Column(Text, nullable=True)   # JSON array de URLs
+    is_published = Column(Boolean, default=True, nullable=False)
+    calendar_color = Column(String, default="#52C41A", nullable=False)
     room = Column(String, nullable=True)
     capacity = Column(Integer, default=0)
     duration = Column(String, nullable=True)       # "10 sem · 1h/sem"

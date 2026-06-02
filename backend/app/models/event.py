@@ -13,8 +13,11 @@ class Event(Base):
     name = Column(String, nullable=False)
     subtitle = Column(String, nullable=True)
     description = Column(Text, nullable=True)
-    image_url   = Column(String, nullable=True)
-    image_focal = Column(String, nullable=True, default="50% 50%")
+    image_url    = Column(String, nullable=True)
+    image_focal  = Column(String, nullable=True, default="50% 50%")
+    video_url    = Column(String, nullable=True)
+    extra_images = Column(Text, nullable=True)   # JSON array de URLs
+    is_published = Column(Boolean, default=True, nullable=False)
     date = Column(Date, nullable=True)
     time_range = Column(String, nullable=True)   # "11:00 – 23:00"
     location = Column(String, nullable=True)

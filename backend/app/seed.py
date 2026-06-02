@@ -28,12 +28,18 @@ def run():
     # Migraciones incrementales — deben ejecutarse ANTES del seed para que
     # los modelos que ya incluyen los nuevos campos no fallen al hacer queries.
     with engine.connect() as conn:
-        conn.execute(text(
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS photo_focal VARCHAR DEFAULT '50% 50%'"
-        ))
-        conn.execute(text(
-            "ALTER TABLE events ADD COLUMN IF NOT EXISTS image_focal VARCHAR DEFAULT '50% 50%'"
-        ))
+        for sql in [
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS photo_focal   VARCHAR DEFAULT '50% 50%'",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS extra_images  TEXT",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS is_published  BOOLEAN DEFAULT TRUE NOT NULL",
+            "ALTER TABLE events   ADD COLUMN IF NOT EXISTS image_focal   VARCHAR DEFAULT '50% 50%'",
+            "ALTER TABLE events   ADD COLUMN IF NOT EXISTS video_url     VARCHAR",
+            "ALTER TABLE events   ADD COLUMN IF NOT EXISTS extra_images  TEXT",
+            "ALTER TABLE events   ADD COLUMN IF NOT EXISTS is_published  BOOLEAN DEFAULT TRUE NOT NULL",
+            "ALTER TABLE courses  ADD COLUMN IF NOT EXISTS extra_images  TEXT",
+            "ALTER TABLE courses  ADD COLUMN IF NOT EXISTS is_published  BOOLEAN DEFAULT TRUE NOT NULL",
+        ]:
+            conn.execute(text(sql))
         conn.commit()
     db = SessionLocal()
     try:

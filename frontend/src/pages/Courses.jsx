@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getCourses } from '../api/client'
 import Reveal from '../components/Reveal'
 import CourseCard from '../components/CourseCard'
-import Modal from '../components/Modal'
+import DetailModal from '../components/DetailModal'
 import { whatsappLink } from '../components/WhatsAppButton'
 
 export default function Courses() {
@@ -26,34 +26,34 @@ export default function Courses() {
       </div>
 
       {selected && (
-        <Modal onClose={() => setSelected(null)} large>
-          <div className="modal-content">
-            <div className="color-bar" style={{ background: selected.calendar_color, marginBottom: '1rem' }} />
-            <img className="modal-img" src={selected.image_url} alt={selected.name}
-              onError={(e) => { e.target.style.opacity = 0.15 }} />
-            <div className="card-meta">
-              <span className="badge">{selected.level}</span>
-              <span className="tag-dim">{selected.style}</span>
-              <span className="tag-dim">{selected.room}</span>
-            </div>
-            <h3>{selected.name}</h3>
-            <p className="tag-dim" style={{ margin: '0.75rem 0' }}>{selected.description}</p>
-            {selected.video_url && (
-              <video className="modal-img" controls>
-                <source src={selected.video_url} type="video/mp4" />
-              </video>
-            )}
-            <p className="tag-dim"><strong>{t('common.teachers')}:</strong> {selected.teachers.map((x) => x.full_name).join(', ')}</p>
-            <p className="tag-dim"><strong>{t('common.duration')}:</strong> {selected.duration}</p>
-            <div className="price-row">
-              <span className="price-big">{Number(selected.price)}€{t('common.perMonth')}</span>
-              <span className="tag-dim">{t('common.trial')}: {Number(selected.trial_price)}€</span>
-            </div>
-            <a className="btn btn-primary" style={{ marginTop: '1.25rem' }}
-              href={whatsappLink(`Hola, me interesa el curso ${selected.name} ${selected.level}`)}
-              target="_blank" rel="noreferrer">{t('common.writeUs')}</a>
+        <DetailModal
+          onClose={() => setSelected(null)}
+          mainImage={selected.image_url}
+          accentColor={selected.calendar_color}
+          videoUrl={selected.video_url}
+          extraImages={selected.extra_images}
+        >
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+            <span className="badge">{selected.level}</span>
+            {selected.style && <span className="tag-dim">{selected.style}</span>}
+            {selected.room  && <span className="tag-dim">📍 {selected.room}</span>}
           </div>
-        </Modal>
+          <h3 style={{ marginBottom: '0.5rem' }}>{selected.name}</h3>
+          <p className="tag-dim" style={{ lineHeight: 1.55, marginBottom: '0.75rem' }}>{selected.description}</p>
+          {selected.teachers?.length > 0 && (
+            <p className="tag-dim"><strong>{t('common.teachers')}:</strong> {selected.teachers.map((x) => x.full_name).join(', ')}</p>
+          )}
+          {selected.duration && (
+            <p className="tag-dim"><strong>{t('common.duration')}:</strong> {selected.duration}</p>
+          )}
+          <div className="price-row" style={{ marginTop: '0.75rem' }}>
+            <span className="price-big">{Number(selected.price)}€{t('common.perMonth')}</span>
+            <span className="tag-dim">{t('common.trial')}: {Number(selected.trial_price)}€</span>
+          </div>
+          <a className="btn btn-primary" style={{ marginTop: '1rem', display: 'inline-flex' }}
+            href={whatsappLink(`Hola, me interesa el curso ${selected.name} ${selected.level}`)}
+            target="_blank" rel="noreferrer">{t('common.writeUs')}</a>
+        </DetailModal>
       )}
     </div>
   )

@@ -22,10 +22,12 @@ class TeacherBase(BaseModel):
     phone: str | None = None
     bio: str | None = None
     specialties: str | None = None
-    photo_url:   str | None = None
-    photo_focal: str | None = "50% 50%"
-    cv_pdf_url:  str | None = None
-    video_url: str | None = None
+    photo_url:    str | None = None
+    photo_focal:  str | None = "50% 50%"
+    extra_images: str | None = None   # JSON array
+    is_published: bool = True
+    cv_pdf_url:   str | None = None
+    video_url:    str | None = None
     availability: str | None = None
     internal_notes: str | None = None
     is_active: bool = True
@@ -72,9 +74,11 @@ class CourseBase(BaseModel):
     level: str | None = None
     style: str | None = None
     description: str | None = None
-    image_url: str | None = None
-    video_url: str | None = None
-    calendar_color: str = "#2FE56B"
+    image_url:    str | None = None
+    video_url:    str | None = None
+    extra_images: str | None = None
+    is_published: bool = True
+    calendar_color: str = "#52C41A"
     room: str | None = None
     capacity: int = 0
     duration: str | None = None
@@ -113,8 +117,11 @@ class EventBase(BaseModel):
     name: str
     subtitle: str | None = None
     description: str | None = None
-    image_url:   str | None = None
-    image_focal: str | None = "50% 50%"
+    image_url:    str | None = None
+    image_focal:  str | None = "50% 50%"
+    video_url:    str | None = None
+    extra_images: str | None = None
+    is_published: bool = True
     date: date_type | None = None
     time_range: str | None = None
     location: str | None = None

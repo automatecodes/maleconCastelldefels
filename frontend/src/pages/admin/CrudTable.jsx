@@ -3,6 +3,7 @@ import { adminGet, adminPost, adminPut, adminDelete } from '../../api/client'
 import Modal from '../../components/Modal'
 import MediaPicker from './MediaPicker'
 import FocalPointPicker from './FocalPointPicker'
+import MultiMediaPicker from './MultiMediaPicker'
 
 /**
  * Tabla CRUD genérica para el admin.
@@ -95,6 +96,18 @@ export default function CrudTable({ title, resource, columns, fields, toPayload,
                     onChange={(url) => onChange(f.name, url)}
                     accept={f.type === 'image' ? 'image' : f.type === 'video' ? 'video' : 'any'}
                   />
+                ) : f.type === 'checkbox' ? (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', margin: 0 }}>
+                    <input type="checkbox" checked={!!form[f.name]} style={{ width: 'auto', accentColor: 'var(--green)' }}
+                      onChange={(e) => onChange(f.name, e.target.checked)} />
+                    <span style={{ fontSize: '0.88rem', color: 'var(--text-dim)' }}>
+                      {form[f.name] ? 'Visible en la web' : 'Oculto en la web'}
+                    </span>
+                  </label>
+                ) : f.type === 'multi-image' ? (
+                  <MultiMediaPicker value={form[f.name] ?? ''} onChange={(v) => onChange(f.name, v)} accept="image" />
+                ) : f.type === 'multi-video' ? (
+                  <MultiMediaPicker value={form[f.name] ?? ''} onChange={(v) => onChange(f.name, v)} accept="video" />
                 ) : f.type === 'focal' ? (
                   <FocalPointPicker
                     imageSrc={form[f.sourceField] ?? ''}

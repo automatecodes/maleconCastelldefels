@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getEvents, getSocial } from '../api/client'
 import Reveal from '../components/Reveal'
 import Modal from '../components/Modal'
+import DetailModal from '../components/DetailModal'
 import SocialFeed from '../components/SocialFeed'
 import { whatsappLink } from '../components/WhatsAppButton'
 
@@ -76,30 +77,35 @@ export default function Events() {
       )}
 
       {selected && (
-        <Modal onClose={() => setSelected(null)} large>
-          <div className="modal-content">
-            <img className="modal-img" src={selected.image_url} alt={selected.name}
-              onError={(e) => { e.target.style.opacity = 0.15 }} />
-            <span className="badge">{selected.date} · {selected.time_range}</span>
-            <h3 style={{ margin: '0.5rem 0' }}>{selected.name}</h3>
-            <p className="accent">{selected.subtitle}</p>
-            <p className="tag-dim" style={{ margin: '0.75rem 0' }}>{selected.description}</p>
-            <p className="tag-dim"><strong>{t('events.where')}:</strong> {selected.location}</p>
-            {selected.price && <p className="tag-dim"><strong>{t('common.price')}:</strong> {Number(selected.price)}€</p>}
-            {selected.artists && <p className="tag-dim"><strong>DJ / Artistas:</strong> {selected.artists}</p>}
-            {selected.activities && (
-              <>
-                <p style={{ marginTop: '0.75rem' }}><strong>{t('events.activities')}:</strong></p>
-                <ul className="tag-dim" style={{ paddingLeft: '1.25rem' }}>
-                  {selected.activities.split('\n').map((a, i) => <li key={i}>{a}</li>)}
-                </ul>
-              </>
-            )}
-            <a className="btn btn-primary" style={{ marginTop: '1.25rem' }}
-              href={whatsappLink(`Hola, quiero info sobre ${selected.name}`)}
-              target="_blank" rel="noreferrer">{t('common.writeUs')}</a>
+        <DetailModal
+          onClose={() => setSelected(null)}
+          mainImage={selected.image_url}
+          mainImageFocal={selected.image_focal}
+          accentColor="#F02D5E"
+          videoUrl={selected.video_url}
+          extraImages={selected.extra_images}
+        >
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+            <span className="badge">{selected.date}{selected.time_range ? ` · ${selected.time_range}` : ''}</span>
           </div>
-        </Modal>
+          <h3 style={{ marginBottom: '0.25rem' }}>{selected.name}</h3>
+          {selected.subtitle && <p className="accent" style={{ marginBottom: '0.5rem' }}>{selected.subtitle}</p>}
+          {selected.description && <p className="tag-dim" style={{ lineHeight: 1.55, marginBottom: '0.5rem' }}>{selected.description}</p>}
+          {selected.location && <p className="tag-dim"><strong>{t('events.where')}:</strong> {selected.location}</p>}
+          {selected.price  && <p className="tag-dim"><strong>{t('common.price')}:</strong> {Number(selected.price)}€</p>}
+          {selected.artists && <p className="tag-dim"><strong>DJ / Artistas:</strong> {selected.artists}</p>}
+          {selected.activities && (
+            <div style={{ marginTop: '0.5rem' }}>
+              <p className="tag-dim" style={{ marginBottom: '0.25rem' }}><strong>{t('events.activities')}:</strong></p>
+              <ul className="tag-dim" style={{ paddingLeft: '1.25rem' }}>
+                {selected.activities.split('\n').filter(Boolean).map((a, i) => <li key={i}>{a}</li>)}
+              </ul>
+            </div>
+          )}
+          <a className="btn btn-primary" style={{ marginTop: '1rem', display: 'inline-flex' }}
+            href={whatsappLink(`Hola, quiero info sobre ${selected.name}`)}
+            target="_blank" rel="noreferrer">{t('common.writeUs')}</a>
+        </DetailModal>
       )}
 
       {lightbox && (

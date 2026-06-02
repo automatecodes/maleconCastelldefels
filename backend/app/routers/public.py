@@ -33,7 +33,7 @@ def public_config():
 
 @router.get("/courses", response_model=list[CourseOut])
 def list_courses(db: Session = Depends(get_db)):
-    return db.query(Course).order_by(Course.featured.desc(), Course.name).all()
+    return db.query(Course).filter(Course.is_published == True).order_by(Course.featured.desc(), Course.name).all()  # noqa: E712
 
 
 @router.get("/courses/{slug}", response_model=CourseOut)
@@ -46,7 +46,7 @@ def get_course(slug: str, db: Session = Depends(get_db)):
 
 @router.get("/teachers", response_model=list[TeacherOut])
 def list_teachers(db: Session = Depends(get_db)):
-    return db.query(Teacher).filter(Teacher.is_active == True).all()  # noqa: E712
+    return db.query(Teacher).filter(Teacher.is_active == True, Teacher.is_published == True).all()  # noqa: E712
 
 
 @router.get("/teachers/{slug}", response_model=TeacherOut)
@@ -66,10 +66,11 @@ def list_events(db: Session = Depends(get_db)):
     today = date.today()
     # Próximos: ascendente (el más cercano primero)
     upcoming = db.query(Event).filter(
+        Event.is_published == True,  # noqa: E712
         (Event.date == None) | (Event.date >= today)  # noqa: E711
     ).order_by(Event.date.asc()).all()
-    # Pasados: descendente (el más reciente primero)
     past = db.query(Event).filter(
+        Event.is_published == True,  # noqa: E712
         Event.date != None, Event.date < today  # noqa: E711
     ).order_by(Event.date.desc()).all()
     result = []

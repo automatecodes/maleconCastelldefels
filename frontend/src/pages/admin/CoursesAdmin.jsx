@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Modal from '../../components/Modal'
 import AiImageButton from './AiImageButton'
 import MediaPicker from './MediaPicker'
+import MultiMediaPicker from './MultiMediaPicker'
 import { generateCourseImage } from '../../api/client'
 
 const API = '/api/admin'
@@ -41,8 +42,10 @@ const EMPTY_FORM = {
   level: 'Inicio',
   style: '',
   description: '',
-  image_url: '',
-  video_url: '',
+  image_url:    '',
+  video_url:    '',
+  extra_images: '',
+  is_published: true,
   calendar_color: '#52C41A',
   room: '',
   capacity: 20,
@@ -110,8 +113,10 @@ export default function CoursesAdmin() {
       level: course.level ?? 'Inicio',
       style: course.style ?? '',
       description: course.description ?? '',
-      image_url: course.image_url ?? '',
-      video_url: course.video_url ?? '',
+      image_url:    course.image_url ?? '',
+      video_url:    course.video_url ?? '',
+      extra_images: course.extra_images ?? '',
+      is_published: course.is_published ?? true,
       calendar_color: course.calendar_color ?? '#52C41A',
       room: course.room ?? '',
       capacity: course.capacity ?? 20,
@@ -310,12 +315,23 @@ export default function CoursesAdmin() {
                 <input type="text" value={form.style} onChange={(e) => onChange('style', e.target.value)} />
               </div>
               <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display:'flex', alignItems:'center', gap:'0.5rem', cursor:'pointer', marginBottom:'0.75rem' }}>
+                  <input type="checkbox" checked={!!form.is_published} style={{ width:'auto', accentColor:'var(--green)' }}
+                    onChange={(e) => onChange('is_published', e.target.checked)} />
+                  <span>{form.is_published ? '✅ Publicado en la web' : '🚫 Oculto en la web'}</span>
+                </label>
+              </div>
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
                 <MediaPicker label="Imagen del curso" accept="image"
                   value={form.image_url} onChange={(url) => onChange('image_url', url)} />
               </div>
               <div className="field" style={{ gridColumn: '1 / -1' }}>
                 <MediaPicker label="Vídeo del curso" accept="video"
                   value={form.video_url} onChange={(url) => onChange('video_url', url)} />
+              </div>
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <MultiMediaPicker label="Imágenes adicionales" accept="image"
+                  value={form.extra_images} onChange={(v) => onChange('extra_images', v)} />
               </div>
               <div className="field">
                 <label>Color calendario</label>

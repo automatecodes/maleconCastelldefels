@@ -6,7 +6,7 @@
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
 .brand { display: flex; align-items: center; gap: 0.6rem; }
-.brand-logo { height: 38px; width: auto; }
+.brand-logo { height: 30px; width: auto; }
 .brand-fallback { font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; color: var(--text); }
 .brand-fallback .accent, .accent { color: var(--green); }
 .main-nav { display: flex; align-items: center; gap: 1.4rem; }

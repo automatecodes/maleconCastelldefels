@@ -62,8 +62,7 @@ export default function Home() {
         <div className="hero-dim" style={{ opacity: videoSettings.overlay }} />
         <div className="hero-overlay" />
         <div className="container hero-content">
-          <span className="badge pill-tag">🌴 {t('common.noPartner')}</span>
-          <h1>{t('home.heroTitle').split(' ').slice(0, -1).join(' ')}{' '}
+<h1>{t('home.heroTitle').split(' ').slice(0, -1).join(' ')}{' '}
             <span className="accent">{t('home.heroTitle').split(' ').slice(-1)}</span></h1>
           <p>{t('home.heroSubtitle')}</p>
           <div className="hero-ctas">

@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import CookieBanner from './components/CookieBanner'
 import WhatsAppButton from './components/WhatsAppButton'
+import { useThemeConfig } from './hooks/useThemeConfig'
 
 import Home from './pages/Home'
 import School from './pages/School'
@@ -55,6 +56,9 @@ export default function App() {
     }
     link.href = '/api/public/theme.css'
   }, [])
+
+  // Cargar y aplicar configuración completa del tema (logo filter + scripts)
+  useThemeConfig()
 
   return (
     <Routes>

@@ -45,14 +45,72 @@ export default function Appearance() {
   const [urlMsg, setUrlMsg] = useState('')
   const [urlPreview, setUrlPreview] = useState('')
 
+  // Tema completo (HTML + scripts + logo filter)
+  const [themeEditMode, setThemeEditMode] = useState(null) // null | 'edit' | 'create'
+  const [themeEditName, setThemeEditName] = useState('')
+  const [themeEditLoading, setThemeEditLoading] = useState(false)
+  const [themeEditSaving, setThemeEditSaving] = useState(false)
+  const [themeEditMsg, setThemeEditMsg] = useState('')
+  const [themeEditData, setThemeEditData] = useState({
+    css_variables: {},
+    html_sections: {},
+    scripts: '',
+    logo_filter: {
+      hue_rotation: 0,
+      saturation: 1.0,
+      brightness: 1.0,
+      drop_shadow_color: '#2FE56B',
+      drop_shadow_blur: 8,
+    },
+  })
+
   const refreshThemes = () =>
     adminGetThemes().then((d) => { setThemes(d.themes); setActive(d.active) }).catch(() => {})
 
-  useEffect(() => {
-    adminGetThemes()
-      .then((d) => { setThemes(d.themes); setActive(d.active) })
-      .catch(() => setMsg(t('appearance.error')))
-  }, [t])
+  // Cargar configuración completa de un tema
+  const loadThemeConfig = async (themeName) => {
+    setThemeEditLoading(true)
+    setThemeEditMsg('')
+    try {
+      const res = await fetch(`/api/admin/themes/config/${themeName}`, { headers: AUTH() })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setThemeEditData(data)
+      setThemeEditName(themeName)
+      setThemeEditMode('edit')
+    } catch {
+      setThemeEditMsg('Error cargando configuración del tema')
+    } finally {
+      setThemeEditLoading(false)
+    }
+  }
+
+  // Guardar configuración completa de un tema
+  const saveThemeConfig = async () => {
+    if (!themeEditName.trim()) return
+    setThemeEditSaving(true)
+    setThemeEditMsg('')
+    try {
+      const res = await fetch(`/api/admin/themes/config/${themeEditName}`, {
+        method: 'PUT',
+        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: themeEditName,
+          ...themeEditData,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      setThemeEditMsg('✅ Configuración guardada')
+      // Recargar tema si está activo
+      if (active === themeEditName) {
+        reloadActiveTheme()
+      }
+    } catch {
+      setThemeEditMsg('❌ Error guardando tema')
+    } finally {
+      setThemeEditSaving(false)
+    }
+  }
 
   const generateFromUrl = async () => {
     if (!urlInput.trim()) return
@@ -401,6 +459,220 @@ export default function Appearance() {
               fontSize: '0.72rem', overflow: 'auto', maxHeight: 160,
               border: '1px solid var(--border)', color: 'var(--text-dim)',
             }}>{urlPreview}…</pre>
+          </div>
+        )}
+      </div>
+
+      {/* Edición de Tema Completo (HTML + Scripts + Logo Filter) */}
+      <div className="card card-body" style={{ maxWidth: 900, marginBottom: '1.5rem' }}>
+        <h3 style={{ marginBottom: '1rem' }}>🎨 Editar tema completo (HTML + Scripts + Logo)</h3>
+        
+        {themeEditMode === null ? (
+          <div>
+            <p className="tag-dim" style={{ marginBottom: '1.25rem', fontSize: '0.88rem' }}>
+              Selecciona un tema para editar su configuración completa: HTML personalizado, scripts, y filtro del logo.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {themes.map((name) => (
+                <button
+                  key={name}
+                  className="btn btn-ghost"
+                  onClick={() => loadThemeConfig(name)}
+                  disabled={themeEditLoading}
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+              <h4 style={{ margin: 0, fontSize: '1rem' }}>Tema: <strong>{themeEditName}</strong></h4>
+              <button className="btn btn-sm btn-ghost" onClick={() => { setThemeEditMode(null); setThemeEditMsg('') }}>
+                ✕ Cerrar
+              </button>
+            </div>
+
+            {/* Logo Filter */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h5 style={{ marginBottom: '1rem', color: 'var(--green)' }}>🔸 Filtro del Logo</h5>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '1rem',
+              }}>
+                <div className="field">
+                  <label>Rotación de tonalidad (grados)</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={themeEditData.logo_filter?.hue_rotation || 0}
+                    onChange={(e) => setThemeEditData((prev) => ({
+                      ...prev,
+                      logo_filter: { ...prev.logo_filter, hue_rotation: parseInt(e.target.value) }
+                    }))}
+                    style={{ width: '100%', accentColor: 'var(--green)' }}
+                  />
+                  <small style={{ display: 'block', marginTop: '0.25rem', color: 'var(--text-dim)' }}>
+                    {themeEditData.logo_filter?.hue_rotation || 0}°
+                  </small>
+                </div>
+
+                <div className="field">
+                  <label>Saturación</label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value={themeEditData.logo_filter?.saturation || 1}
+                    onChange={(e) => setThemeEditData((prev) => ({
+                      ...prev,
+                      logo_filter: { ...prev.logo_filter, saturation: parseFloat(e.target.value) }
+                    }))}
+                    style={{ width: '100%', accentColor: 'var(--green)' }}
+                  />
+                  <small style={{ display: 'block', marginTop: '0.25rem', color: 'var(--text-dim)' }}>
+                    {(themeEditData.logo_filter?.saturation || 1).toFixed(1)}×
+                  </small>
+                </div>
+
+                <div className="field">
+                  <label>Brillo</label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="1.5"
+                    step="0.1"
+                    value={themeEditData.logo_filter?.brightness || 1}
+                    onChange={(e) => setThemeEditData((prev) => ({
+                      ...prev,
+                      logo_filter: { ...prev.logo_filter, brightness: parseFloat(e.target.value) }
+                    }))}
+                    style={{ width: '100%', accentColor: 'var(--green)' }}
+                  />
+                  <small style={{ display: 'block', marginTop: '0.25rem', color: 'var(--text-dim)' }}>
+                    {(themeEditData.logo_filter?.brightness || 1).toFixed(1)}×
+                  </small>
+                </div>
+
+                <div className="field">
+                  <label>Color sombra del logo</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <input
+                      type="color"
+                      value={themeEditData.logo_filter?.drop_shadow_color || '#2FE56B'}
+                      onChange={(e) => setThemeEditData((prev) => ({
+                        ...prev,
+                        logo_filter: { ...prev.logo_filter, drop_shadow_color: e.target.value }
+                      }))}
+                      style={{ width: 42, height: 34, padding: 2, cursor: 'pointer', borderRadius: 6, border: '1px solid var(--border)' }}
+                    />
+                    <input
+                      type="text"
+                      value={themeEditData.logo_filter?.drop_shadow_color || '#2FE56B'}
+                      onChange={(e) => setThemeEditData((prev) => ({
+                        ...prev,
+                        logo_filter: { ...prev.logo_filter, drop_shadow_color: e.target.value }
+                      }))}
+                      style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.82rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Blur de sombra (px)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    value={themeEditData.logo_filter?.drop_shadow_blur || 8}
+                    onChange={(e) => setThemeEditData((prev) => ({
+                      ...prev,
+                      logo_filter: { ...prev.logo_filter, drop_shadow_blur: parseInt(e.target.value) }
+                    }))}
+                  />
+                </div>
+              </div>
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'var(--surface-2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                <small style={{ display: 'block', color: 'var(--text-dim)' }}>
+                  Vista previa del filtro CSS:
+                </small>
+                <code style={{ fontSize: '0.75rem', color: 'var(--green)', fontFamily: 'monospace', display: 'block', marginTop: '0.35rem' }}>
+                  filter: hue-rotate({themeEditData.logo_filter?.hue_rotation || 0}deg) saturate({(themeEditData.logo_filter?.saturation || 1).toFixed(1)}) brightness({(themeEditData.logo_filter?.brightness || 1).toFixed(1)})
+                </code>
+              </div>
+            </div>
+
+            {/* Scripts */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h5 style={{ marginBottom: '1rem', color: 'var(--green)' }}>⚙️ Scripts personalizados</h5>
+              <textarea
+                value={themeEditData.scripts || ''}
+                onChange={(e) => setThemeEditData((prev) => ({ ...prev, scripts: e.target.value }))}
+                placeholder="// JavaScript personalizado que se inyectará en la página (ej: inicializadores, listeners)"
+                style={{
+                  width: '100%',
+                  minHeight: 200,
+                  fontFamily: 'monospace',
+                  fontSize: '0.82rem',
+                  padding: '0.75rem',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  background: 'var(--surface-2)',
+                }}
+              />
+            </div>
+
+            {/* HTML Sections */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h5 style={{ marginBottom: '1rem', color: 'var(--green)' }}>🏗️ Secciones HTML</h5>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {['header', 'footer', 'hero', 'sections'].map((section) => (
+                  <div key={section} className="field">
+                    <label htmlFor={`html-${section}`}>{section.charAt(0).toUpperCase() + section.slice(1)}</label>
+                    <textarea
+                      id={`html-${section}`}
+                      value={themeEditData.html_sections?.[section] || ''}
+                      onChange={(e) => setThemeEditData((prev) => ({
+                        ...prev,
+                        html_sections: { ...prev.html_sections, [section]: e.target.value }
+                      }))}
+                      placeholder={`HTML personalizado para la sección ${section}`}
+                      style={{
+                        width: '100%',
+                        minHeight: 120,
+                        fontFamily: 'monospace',
+                        fontSize: '0.78rem',
+                        padding: '0.75rem',
+                        border: '1px solid var(--border)',
+                        borderRadius: 6,
+                        background: 'var(--surface-2)',
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Botones de guardar */}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+              <button
+                className="btn btn-primary"
+                onClick={saveThemeConfig}
+                disabled={themeEditSaving}
+              >
+                {themeEditSaving ? 'Guardando…' : '✅ Guardar configuración'}
+              </button>
+              {themeEditMsg && (
+                <span style={{ fontSize: '0.88rem', color: themeEditMsg.startsWith('✅') ? 'var(--green)' : '#ef4444' }}>
+                  {themeEditMsg}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>

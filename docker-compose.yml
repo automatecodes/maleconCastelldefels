@@ -1,6 +1,7 @@
 services:
-  db:
+  maleconcastelldefels-db:
     image: postgres:16-alpine
+    container_name: maleconcastelldefels-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -9,57 +10,73 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     networks:
-      - internal
+      - maleconcastelldefels_internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
 
-  api:
+  maleconcastelldefels-api:
     build: ./backend
+    container_name: maleconcastelldefels-api
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_HOST: db
+      POSTGRES_HOST: maleconcastelldefels-db
       MEDIA_ROOT: /data/media
     volumes:
       - ./data/media:/data/media
     depends_on:
-      db:
+      maleconcastelldefels-db:
         condition: service_healthy
     networks:
-      - internal
+      maleconcastelldefels_internal:
+        aliases:
+          - api
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  worker:
+  maleconcastelldefels-worker:
     build: ./worker
+    container_name: maleconcastelldefels-worker
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_HOST: db
+      POSTGRES_HOST: maleconcastelldefels-db
     depends_on:
-      db:
+      maleconcastelldefels-db:
         condition: service_healthy
     networks:
-      - internal
+      - maleconcastelldefels_internal
 
-  frontend:
+  maleconcastelldefels-frontend:
     build: ./frontend
+    container_name: maleconcastelldefels-frontend
     restart: unless-stopped
-    # Servido por nginx-proxy + acme-companion (SSL). No se exponen puertos al host.
-    environment:
-      VIRTUAL_HOST: ${DOMAIN}
-      VIRTUAL_PORT: 80
-      LETSENCRYPT_HOST: ${DOMAIN}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     depends_on:
-      - api
+      maleconcastelldefels-api:
+        condition: service_healthy
     networks:
-      - internal
+      - maleconcastelldefels_internal
       - proxyNet
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
-  internal:
+  maleconcastelldefels_internal:
+    name: maleconcastelldefels_internal
     driver: bridge
+    internal: true
   proxyNet:
     external: true
+    name: proxyNet

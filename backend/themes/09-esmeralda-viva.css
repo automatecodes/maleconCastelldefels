@@ -1,0 +1,296 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ESMERALDA VIVA — Fondo blanco · Verde esmeralda · Grafito negro
+   Escuela de baile mediterránea · Estilo moderno premium
+   Tipografía: Plus Jakarta Sans — Diseño limpio, con carácter y energía
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+/* ── Variables del sistema ── */
+:root {
+  /* Paleta principal */
+  --bg:          #FFFFFF;
+  --surface:     #F4FAF6;
+  --surface-2:   #EAF5ED;
+  --border:      #BFE0CA;
+  --green:       #197A41;       /* Verde esmeralda rico — WCAG AA sobre blanco */
+  --green-hover: #125F32;       /* Más oscuro en hover — WCAG AAA */
+  --amber:       #C47D09;       /* Oro cálido de acento */
+  --text:        #0C1B11;       /* Grafito verde — más cálido que negro puro */
+  --text-dim:    #3E6649;       /* Verde musgo — texto secundario legible */
+
+  /* Efectos: sombras premium (sin neon en fondo blanco) */
+  --glow:        0 4px 22px rgba(25,122,65,0.18), 0 1px 5px rgba(25,122,65,0.10);
+  --radius:      16px;
+  --maxw:        1180px;
+
+  /* Tipografía premium */
+  --font-head: 'Plus Jakarta Sans', 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+
+  /* Componentes */
+  --header-bg:     rgba(255,255,255,0.97);
+  --header-border: rgba(191,224,202,0.90);
+  --hero-overlay:  linear-gradient(
+                     175deg,
+                     rgba(10,25,15,0.18) 0%,
+                     rgba(10,25,15,0.54) 52%,
+                     rgba(10,25,15,0.91) 100%
+                   );
+  --footer-bg:     #091910;
+  --footer-border: rgba(25,122,65,0.20);
+}
+
+/* ═══════════════════════════════
+   BODY — Fondo limpio con sutil
+   gradiente de profundidad
+═══════════════════════════════ */
+body {
+  background: var(--bg);
+  color: var(--text);
+  background-image:
+    radial-gradient(ellipse 70% 45% at 2% 5%,  rgba(25,122,65,0.055) 0%, transparent 100%),
+    radial-gradient(ellipse 55% 40% at 98% 96%, rgba(25,122,65,0.045) 0%, transparent 100%);
+}
+
+/* ═══════════════════════════════
+   TIPOGRAFÍA
+═══════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-head);
+  letter-spacing: -0.024em;
+}
+h1 { font-weight: 800; }
+h2 { font-weight: 700; }
+h3, h4 { font-weight: 700; }
+
+/* Línea de énfasis degradada bajo h2 */
+h2 {
+  position: relative;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 3.25rem;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--green) 0%, #3DDC7A 100%);
+}
+
+/* ═══════════════════════════════
+   ACCENT
+═══════════════════════════════ */
+.accent { color: var(--green); }
+
+/* ═══════════════════════════════
+   NAVEGACIÓN
+═══════════════════════════════ */
+.nav-link {
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.nav-link:hover, .nav-link.active { color: var(--green); }
+
+.lang-trigger { border-color: var(--border); color: var(--text); }
+.lang-dropdown { background: #fff; border-color: var(--border); box-shadow: 0 8px 32px rgba(12,27,17,0.12); }
+
+/* ═══════════════════════════════
+   BOTONES
+═══════════════════════════════ */
+.btn-primary {
+  background: linear-gradient(140deg, var(--green) 0%, #22A455 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 4px 16px rgba(25,122,65,0.36),
+    0 1px 3px  rgba(25,122,65,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+}
+.btn-primary:hover {
+  background: linear-gradient(140deg, var(--green-hover) 0%, var(--green) 100%);
+  box-shadow:
+    0 8px 30px rgba(25,122,65,0.44),
+    0 2px 7px  rgba(25,122,65,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  background: rgba(255,255,255,0.90);
+  backdrop-filter: blur(10px);
+}
+.btn-ghost:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(25,122,65,0.05);
+  box-shadow: none;
+}
+
+.btn-amber {
+  background: linear-gradient(140deg, var(--amber) 0%, #E09020 100%);
+  color: #fff;
+}
+
+/* ═══════════════════════════════
+   TARJETAS — Efecto premium
+   Barra verde deslizante en top
+═══════════════════════════════ */
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 14px rgba(12,27,17,0.07), 0 1px 4px rgba(12,27,17,0.04);
+  transition: box-shadow 0.30s ease, transform 0.30s ease, border-color 0.30s ease;
+}
+.card:hover {
+  border-color: rgba(25,122,65,0.32);
+  box-shadow:
+    0 14px 52px rgba(12,27,17,0.12),
+    0 4px 16px rgba(12,27,17,0.07),
+    inset 0 3px 0 var(--green);      /* barra superior verde en hover */
+  transform: translateY(-5px);
+}
+
+/* Tratamiento fotográfico: sutil b&w → color vivo */
+.media-top img,
+.card img:not(.lang-flag):not(.sch-cell-thumb):not(.footer-logo) {
+  filter: saturate(0.80) brightness(1.02) contrast(1.01);
+  transition: filter 0.48s ease;
+}
+.media-top:hover img,
+.card:hover img:not(.lang-flag):not(.sch-cell-thumb):not(.footer-logo) {
+  filter: saturate(1.20) brightness(1.04) contrast(1.03);
+}
+
+/* ═══════════════════════════════
+   BADGES
+═══════════════════════════════ */
+.badge {
+  background: rgba(25,122,65,0.09);
+  border: 1.5px solid rgba(25,122,65,0.30);
+  color: var(--green);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════
+   FORMULARIOS
+═══════════════════════════════ */
+input, select, textarea {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: inset 0 1px 3px rgba(12,27,17,0.05);
+  transition: border-color 0.20s, box-shadow 0.20s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(25,122,65,0.12);
+  outline: none;
+}
+label { color: var(--text-dim); font-weight: 600; }
+
+/* ═══════════════════════════════
+   PRECIO
+═══════════════════════════════ */
+.price-big {
+  color: var(--green);
+  font-weight: 800;
+}
+.color-bar { background: linear-gradient(90deg, var(--green), #3DDC7A); }
+
+/* ═══════════════════════════════
+   CARRUSEL
+═══════════════════════════════ */
+.carousel-dot.active { background: var(--green); box-shadow: 0 0 0 3px rgba(25,122,65,0.22); }
+
+/* ═══════════════════════════════
+   FOOTER — Fondo bosque oscuro
+   Alto contraste con el cuerpo
+═══════════════════════════════ */
+.site-footer {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+}
+.footer-col-title {
+  color: #E6F4EA;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.footer-tagline, .footer-ci { color: #6FA87D; }
+.footer-links a             { color: #6FA87D; transition: color 0.18s; }
+.footer-links a:hover       { color: #4ADE80; }
+.footer-follow-label        { color: #6FA87D; }
+.footer-bottom {
+  color: #3D7A50;
+  border-top-color: rgba(25,122,65,0.14) !important;
+}
+
+/* ═══════════════════════════════
+   SECCIÓN HÉROE — texto claro
+   (el vídeo oscurece el fondo)
+═══════════════════════════════ */
+.hero-content h1, .hero-content p { color: #F0F9F3; }
+.hero-content .accent            { color: #4ADE80; }
+
+/* ═══════════════════════════════
+   SECCIÓN ALTERNAS — micro tinte
+═══════════════════════════════ */
+section:nth-of-type(even):not(.hero-section) {
+  background: var(--surface);
+}
+
+/* ═══════════════════════════════
+   HORARIO / CALENDARIO
+═══════════════════════════════ */
+.sch-day-header {
+  color: var(--text-dim);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.sch-cell.today { border: 1.5px solid var(--green); }
+
+/* ═══════════════════════════════
+   MODAL
+═══════════════════════════════ */
+.modal-content {
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 80px rgba(12,27,17,0.16);
+}
+.modal-close:hover { color: var(--green); }
+
+/* ═══════════════════════════════
+   COOKIE BANNER
+═══════════════════════════════ */
+.cookie-banner {
+  background: #fff;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 24px rgba(12,27,17,0.08);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════
+   PANEL ADMIN — tinte verde en
+   items activos + KPI cards
+═══════════════════════════════ */
+.admin-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+.admin-nav-link.active {
+  background: rgba(25,122,65,0.10);
+  color: var(--green);
+  border-left: 3px solid var(--green);
+}
+.admin-nav-link:hover:not(.active) {
+  background: rgba(25,122,65,0.05);
+  color: var(--green);
+}
+.kpi-value { color: var(--green); font-weight: 800; }

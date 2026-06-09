@@ -8,6 +8,7 @@ web en `/api/public/theme.css` (proxied bajo /api en dev y prod, sin CORS).
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+import json
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -22,6 +23,10 @@ public_router = APIRouter(prefix="/api/public", tags=["public:theme"])
 
 
 CSS_VAR_PREFIX = "CSS_VAR_"
+THEME_PREFIX = "THEME_"
+THEME_HTML_SUFFIX = "_HTML"
+THEME_SCRIPTS_SUFFIX = "_SCRIPTS"
+THEME_LOGO_FILTER_SUFFIX = "_LOGO_FILTER"
 
 
 class ThemeSelection(BaseModel):
@@ -30,6 +35,25 @@ class ThemeSelection(BaseModel):
 
 class CssVars(BaseModel):
     vars: dict[str, str] = {}
+
+
+class LogoFilterConfig(BaseModel):
+    """Configuración de filtro CSS para el logo según tema."""
+    hue_rotation: int = 0  # grados (0-360)
+    saturation: float = 1.0  # 0.0-2.0
+    brightness: float = 1.0  # 0.0-2.0
+    drop_shadow_color: str = "#2FE56B"  # color sombra
+    drop_shadow_blur: int = 8  # píxeles
+
+
+class ThemeConfig(BaseModel):
+    """Configuración completa de un tema."""
+    name: str  # nombre/slug del tema
+    css_variables: dict[str, str] = {}  # {--verde: "#2FE56B"}
+    html_sections: dict[str, str] = {}  # {header: "<header>...", footer: "<footer>..."}
+    scripts: str = ""  # código JavaScript personalizado
+    logo_filter: LogoFilterConfig = LogoFilterConfig()
+    metadata: dict[str, str] = {}  # datos adicionales
 
 
 class ThemeFromURL(BaseModel):
@@ -161,6 +185,28 @@ def active_theme(db: Session = Depends(get_db)):
     return {"active": _get_active(db)}
 
 
+@public_router.get("/theme-config")
+def active_theme_config(db: Session = Depends(get_db)):
+    """Devuelve la configuración del tema activo (incluyendo logo filter)."""
+    active = _get_active(db)
+    if not active:
+        return {
+            "active": "",
+            "logo_filter": LogoFilterConfig().model_dump(),
+            "html_sections": {},
+            "scripts": ""
+        }
+    
+    config = _get_theme_config(active, db)
+    return {
+        "active": active,
+        "logo_filter": config.logo_filter.model_dump(),
+        "html_sections": config.html_sections,
+        "scripts": config.scripts,
+        "css_variables": config.css_variables
+    }
+
+
 @public_router.get("/theme.css")
 def active_theme_css(db: Session = Depends(get_db)):
     """CSS activo + variables personalizadas inyectadas en :root."""
@@ -178,3 +224,132 @@ def active_theme_css(db: Session = Depends(get_db)):
         )
         css = f":root {{\n{overrides}\n}}\n" + css
     return Response(content=css, media_type="text/css")
+
+
+# ============ Temas Completos (con HTML, scripts, logo filter) ============
+
+def _get_theme_config(theme_name: str, db: Session) -> ThemeConfig:
+    """Lee toda la configuración de un tema desde SiteSetting."""
+    prefix = f"{THEME_PREFIX}{theme_name}"
+    
+    # Leer variables CSS
+    css_var_rows = db.query(SiteSetting).filter(
+        SiteSetting.key.startswith(f"{prefix}_CSS_VAR_")
+    ).all()
+    css_vars = {r.key[len(f"{prefix}_CSS_VAR_"):]: r.value for r in css_var_rows}
+    
+    # Leer HTML sections
+    html_row = db.get(SiteSetting, f"{prefix}{THEME_HTML_SUFFIX}")
+    html_sections = json.loads(html_row.value) if html_row and html_row.value else {}
+    
+    # Leer scripts
+    scripts_row = db.get(SiteSetting, f"{prefix}{THEME_SCRIPTS_SUFFIX}")
+    scripts = scripts_row.value if scripts_row and scripts_row.value else ""
+    
+    # Leer logo filter
+    logo_filter_row = db.get(SiteSetting, f"{prefix}{THEME_LOGO_FILTER_SUFFIX}")
+    logo_filter = LogoFilterConfig()
+    if logo_filter_row and logo_filter_row.value:
+        try:
+            logo_filter = LogoFilterConfig(**json.loads(logo_filter_row.value))
+        except:
+            pass
+    
+    # Metadatos generales
+    metadata = {}
+    
+    return ThemeConfig(
+        name=theme_name,
+        css_variables=css_vars,
+        html_sections=html_sections,
+        scripts=scripts,
+        logo_filter=logo_filter,
+        metadata=metadata
+    )
+
+
+def _save_theme_config(config: ThemeConfig, db: Session):
+    """Persiste toda la configuración de un tema en SiteSetting."""
+    prefix = f"{THEME_PREFIX}{config.name}"
+    
+    # Guardar variables CSS
+    for var_name, var_value in config.css_variables.items():
+        key = f"{prefix}_CSS_VAR_{var_name.lstrip('-')}"
+        row = db.get(SiteSetting, key)
+        if row:
+            row.value = var_value
+        else:
+            db.add(SiteSetting(key=key, value=var_value))
+    
+    # Guardar HTML sections
+    if config.html_sections:
+        html_key = f"{prefix}{THEME_HTML_SUFFIX}"
+        row = db.get(SiteSetting, html_key)
+        html_json = json.dumps(config.html_sections, ensure_ascii=False)
+        if row:
+            row.value = html_json
+        else:
+            db.add(SiteSetting(key=html_key, value=html_json))
+    
+    # Guardar scripts
+    if config.scripts:
+        scripts_key = f"{prefix}{THEME_SCRIPTS_SUFFIX}"
+        row = db.get(SiteSetting, scripts_key)
+        if row:
+            row.value = config.scripts
+        else:
+            db.add(SiteSetting(key=scripts_key, value=config.scripts))
+    
+    # Guardar logo filter
+    logo_filter_key = f"{prefix}{THEME_LOGO_FILTER_SUFFIX}"
+    row = db.get(SiteSetting, logo_filter_key)
+    logo_json = json.dumps(config.logo_filter.model_dump(), ensure_ascii=False)
+    if row:
+        row.value = logo_json
+    else:
+        db.add(SiteSetting(key=logo_filter_key, value=logo_json))
+    
+    db.commit()
+
+
+@router.get("/config/{theme_name}")
+def get_theme_config(theme_name: str, db: Session = Depends(get_db)):
+    """Lee toda la configuración de un tema (CSS, HTML, scripts, logo filter)."""
+    config = _get_theme_config(theme_name, db)
+    return config.model_dump()
+
+
+@router.put("/config/{theme_name}")
+def save_theme_config(theme_name: str, config: ThemeConfig, db: Session = Depends(get_db)):
+    """Guarda toda la configuración de un tema."""
+    config.name = theme_name
+    _save_theme_config(config, db)
+    return {"saved": theme_name, "fields": len(config.css_variables) + len(config.html_sections) + bool(config.scripts)}
+
+
+@router.get("/export-complete")
+def export_complete_theme(db: Session = Depends(get_db)):
+    """Exporta tema activo completo: CSS + HTML + scripts + logo filter."""
+    active = _get_active(db)
+    if not active:
+        raise HTTPException(400, "No hay tema activo")
+    
+    config = _get_theme_config(active, db)
+    return {
+        "theme_name": active,
+        "config": config.model_dump(),
+        "timestamp": str(__import__("datetime").datetime.now())
+    }
+
+
+@router.post("/import-complete")
+def import_complete_theme(data: dict, db: Session = Depends(get_db)):
+    """Importa un tema completo desde JSON exportado."""
+    try:
+        theme_name = data.get("theme_name", "tema-importado")
+        config_data = data.get("config", {})
+        config = ThemeConfig(**config_data, name=theme_name)
+        _save_theme_config(config, db)
+        return {"imported": theme_name}
+    except Exception as e:
+        raise HTTPException(400, f"Error al importar tema: {str(e)}")

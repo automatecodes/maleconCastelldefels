@@ -1,5 +1,5 @@
 services:
-  maleconcastelldefels-db:
+  db:
     image: postgres:16-alpine
     container_name: maleconcastelldefels-db
     restart: unless-stopped
@@ -10,7 +10,12 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     networks:
-      - maleconcastelldefels_internal
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -18,23 +23,28 @@ services:
       retries: 5
       start_period: 20s
 
-  maleconcastelldefels-api:
+  api:
     build: ./backend
     container_name: maleconcastelldefels-api
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_HOST: maleconcastelldefels-db
+      POSTGRES_HOST: db
       MEDIA_ROOT: /data/media
+      THEMES_DIR: /themes
     volumes:
       - ./data/media:/data/media
+      - ./themes:/themes:ro
     depends_on:
-      maleconcastelldefels-db:
+      db:
         condition: service_healthy
     networks:
-      maleconcastelldefels_internal:
-        aliases:
-          - api
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
     healthcheck:
       test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')\""]
       interval: 30s
@@ -42,29 +52,45 @@ services:
       retries: 3
       start_period: 30s
 
-  maleconcastelldefels-worker:
+  worker:
     build: ./worker
     container_name: maleconcastelldefels-worker
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_HOST: maleconcastelldefels-db
+      POSTGRES_HOST: db
     depends_on:
-      maleconcastelldefels-db:
+      db:
         condition: service_healthy
     networks:
-      - maleconcastelldefels_internal
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'python' > /dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
-  maleconcastelldefels-frontend:
+  frontend:
     build: ./frontend
     container_name: maleconcastelldefels-frontend
     restart: unless-stopped
     depends_on:
-      maleconcastelldefels-api:
+      api:
         condition: service_healthy
     networks:
-      - maleconcastelldefels_internal
+      - internal
       - proxyNet
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost/"]
       interval: 30s
@@ -73,7 +99,7 @@ services:
       start_period: 30s
 
 networks:
-  maleconcastelldefels_internal:
+  internal:
     name: maleconcastelldefels_internal
     driver: bridge
     internal: true

@@ -77,16 +77,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
 
     # Temas / hojas de estilo seleccionables desde el admin.
-    # Si se deja vacío, se usa frontend/src/styles del repositorio.
+    # En Docker, se monta el volumen ./themes:/themes y se pasa THEMES_DIR=/themes.
+    # En local sin Docker, se busca el directorio themes/ en la raíz del proyecto.
     THEMES_DIR: str = ""
 
     @property
     def themes_path(self) -> Path:
         if self.THEMES_DIR:
             return Path(self.THEMES_DIR)
-        # config.py -> app/core -> app -> /app (workdir) -> themes/
-        # Funciona tanto en local como en Docker (COPY . . incluye backend/themes/)
-        return Path(__file__).resolve().parents[2] / "themes"
+        # Sube desde config.py (backend/app/core/) hasta la raíz del proyecto
+        return Path(__file__).resolve().parents[3] / "themes"
 
     @property
     def database_url(self) -> str:

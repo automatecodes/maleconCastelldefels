@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════
+   BOTÁNICA PURA — Blanco mineral · Verde bosque · Orgánico premium
+   ══════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+:root {
+  --bg:         #FFFFFF;
+  --surface:    #F5F9F6;
+  --surface-2:  #EBF3EE;
+  --border:     #C8DDD0;
+  --green:      #1C5C35;
+  --green-hover:#145028;
+  --amber:      #8B5E3C;
+  --text:       #0D1E14;
+  --text-dim:   #567068;
+  --glow: 0 4px 32px rgba(28,92,53,0.13), 0 2px 8px rgba(0,0,0,0.04);
+  --radius: 18px;
+  --font-head: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --header-bg:     rgba(255,255,255,0.96);
+  --header-border: rgba(200,221,208,0.85);
+  --hero-overlay:  linear-gradient(180deg, rgba(13,30,20,0.45) 0%, rgba(13,30,20,0.88) 100%);
+  --footer-bg:     #F5F9F6;
+  --footer-border: #C8DDD0;
+}
+
+/* Organic dot grid background */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(28,92,53,0.055) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* Glass header */
+.site-header {
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+/* Serif headings — elegant organic */
+h1, h2, h3, h4 {
+  font-family: var(--font-head);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+h1 { font-style: italic; }
+h2 { color: var(--text); }
+
+/* Green gradient accent line under section titles */
+.section-title {
+  position: relative;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 3.5rem;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green), transparent);
+}
+
+.accent { color: var(--green); }
+.section-sub { color: var(--text-dim); }
+
+/* Navigation */
+.nav-link {
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.nav-link:hover { color: var(--green); }
+.nav-link.active {
+  color: var(--green);
+  position: relative;
+}
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--green);
+}
+.lang-trigger { border-color: var(--border); color: var(--text); }
+
+/* Buttons */
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 14px rgba(28,92,53,0.22);
+  transition: all 0.32s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-primary:hover {
+  background: var(--green-hover);
+  box-shadow: 0 8px 32px rgba(28,92,53,0.3);
+  transform: translateY(-3px) scale(1.015);
+}
+.btn-ghost {
+  border-color: var(--border);
+  color: var(--text);
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(8px);
+  font-weight: 500;
+}
+.btn-ghost:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(28,92,53,0.04);
+  box-shadow: none;
+}
+
+/* Cards — elevated organic */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow:
+    0 2px 12px rgba(0,0,0,0.04),
+    0 1px 3px rgba(0,0,0,0.03);
+  transition: all 0.38s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+/* Subtle botanical shimmer on hover */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(28,92,53,0.05) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.38s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.card:hover {
+  border-color: rgba(28,92,53,0.32);
+  box-shadow:
+    0 12px 48px rgba(28,92,53,0.11),
+    0 4px 16px rgba(0,0,0,0.05);
+  transform: translateY(-5px);
+}
+.card:hover::after { opacity: 1; }
+
+/* Images — gentle desaturate with zoom bloom */
+.media-top img,
+.card img:not(.lang-flag):not(.sch-cell-thumb):not(.footer-logo) {
+  filter: saturate(0.82) brightness(0.98);
+  transition:
+    filter 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: center;
+  will-change: filter, transform;
+}
+.media-top:hover img,
+.card:hover img:not(.lang-flag):not(.sch-cell-thumb):not(.footer-logo) {
+  filter: saturate(1.18) brightness(1.05) contrast(1.02);
+  transform: scale(1.05);
+}
+
+/* Gallery transitions */
+.carousel-slide, .gallery-item {
+  transition: transform 0.55s cubic-bezier(0.23,1,0.32,1), opacity 0.55s ease;
+}
+
+/* Video hero — organic vignette from edges */
+.hero-overlay {
+  background: var(--hero-overlay) !important;
+}
+
+/* Badges */
+.badge {
+  background: rgba(28,92,53,0.09);
+  border: 1px solid rgba(28,92,53,0.24);
+  color: var(--green);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Inputs */
+input, select, textarea {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.04);
+  font-family: var(--font-body);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(28,92,53,0.10), inset 0 1px 3px rgba(0,0,0,0.02);
+}
+
+/* Footer */
+.site-footer { background: var(--footer-bg); }
+.footer-col-title {
+  color: var(--text);
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 1.05rem;
+}
+.footer-tagline, .footer-ci, .footer-links a, .footer-follow-label { color: var(--text-dim); }
+.footer-links a:hover { color: var(--green); }
+.footer-bottom { color: var(--text-dim); }
+
+/* Scroll reveal — organic spring */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px) scale(0.985);
+  transition:
+    opacity 0.82s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.82s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.reveal.is-visible { opacity: 1; transform: none; }

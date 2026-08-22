@@ -39,7 +39,7 @@ export default function Events() {
           {upcoming.map((e) => (
             <div key={e.id} className="card" onClick={() => setSelected(e)} style={{ cursor: 'pointer' }}>
               <div className="media-top">
-                <img src={e.image_url} alt={e.name}
+                <img src={e.image_url} alt={e.name} loading="lazy"
                   style={{ objectPosition: e.image_focal || '50% 50%' }}
                   onError={(ev) => { ev.target.style.opacity = 0.15 }} />
               </div>
@@ -60,7 +60,8 @@ export default function Events() {
           <h3 style={{ marginBottom: '1rem' }}>{t('events.gallery')}</h3>
           <div className="collage">
             {galleryPhotos.map((p) => (
-              <img key={p.id} src={p.url} alt={p.caption || ''} onClick={() => setLightbox(p.url)}
+              <img key={p.id} src={p.url} alt={p.caption || ''} loading="lazy"
+                onClick={() => setLightbox(p.url)}
                 onError={(e) => { e.target.style.opacity = 0.2 }} />
             ))}
           </div>

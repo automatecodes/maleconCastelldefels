@@ -6,7 +6,7 @@ export default function CourseCard({ course, onClick }) {
     <div className="card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="color-bar" style={{ background: course.calendar_color }} />
       <div className="media-top">
-        <img src={course.image_url} alt={course.name}
+        <img src={course.image_url} alt={course.name} loading="lazy"
           onError={(e) => { e.target.style.opacity = 0.15 }} />
       </div>
       <div className="card-body">

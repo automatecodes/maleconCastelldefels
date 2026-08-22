@@ -50,7 +50,7 @@ export default function School() {
           {teachers.map((tch) => (
             <div key={tch.id} className="card teacher-card" onClick={() => setSelected(tch)}
               style={{ cursor: 'pointer' }}>
-              <img className="teacher-photo" src={tch.photo_url} alt={tch.full_name}
+              <img className="teacher-photo" src={tch.photo_url} alt={tch.full_name} loading="lazy"
                 style={{ objectPosition: tch.photo_focal || '50% 50%' }}
                 onError={(e) => { e.target.style.opacity = 0.2 }} />
               <div className="card-body">

@@ -27,17 +27,39 @@ function fmtShort(date) {
 // ── Celdas ────────────────────────────────────────────────────────────────────
 
 function SessionCell({ session, course, onClick }) {
-  const teacher = course.teachers?.[0]
-  const thumb = teacher?.photo_url || course.image_url
+  const teachers = course.teachers || []
+  const t1 = teachers[0] || null
+  const t2 = teachers[1] || null
+  const fallback = course.image_url
+
   return (
     <div className="sch-cell sch-cell--course" style={{ '--cell-color': course.calendar_color }} onClick={onClick}>
-      <div className="sch-cell-time">{session.start_time}–{session.end_time}</div>
-      <div className="sch-cell-body">
-        {thumb && (
-          <img className="sch-cell-thumb" src={thumb} alt={teacher?.full_name || course.name}
+      <div className={`sch-cell-body${t2 ? ' sch-cell-body--dual' : ''}`}>
+
+        {/* Foto izquierda: primer profesor o imagen del curso */}
+        {(t1?.photo_url || fallback) && (
+          <img className="sch-cell-thumb"
+            src={t1?.photo_url || fallback}
+            alt={t1?.full_name || course.name}
             onError={(e) => { e.target.style.display = 'none' }} />
         )}
-        <span className="sch-cell-name">{course.name}</span>
+
+        {/* Texto centrado */}
+        <div className="sch-cell-info">
+          <span className="sch-cell-name">{course.name}</span>
+          <span className="sch-cell-time">{session.start_time}–{session.end_time}</span>
+          {(session.room || course.room) && (
+            <span className="sch-cell-room">{session.room || course.room}</span>
+          )}
+        </div>
+
+        {/* Foto derecha: segundo profesor */}
+        {t2?.photo_url && (
+          <img className="sch-cell-thumb"
+            src={t2.photo_url}
+            alt={t2.full_name}
+            onError={(e) => { e.target.style.display = 'none' }} />
+        )}
       </div>
     </div>
   )
@@ -224,7 +246,7 @@ function EventModal({ event, onClose }) {
 
 export default function Schedule() {
   const { t } = useTranslation()
-  const [view, setView] = useState('monthly')
+  const [view, setView] = useState('semanal')
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [monthOffset, setMonthOffset] = useState(0)
   const [courses, setCourses] = useState([])
@@ -371,19 +393,31 @@ export default function Schedule() {
                 ))}
                 {daySessions.map((s) => {
                   const c = courseById[s.course_id]
-                  const teacher = c.teachers?.[0]
-                  const thumb = teacher?.photo_url || c.image_url
+                  const teachers = c.teachers || []
+                  const t1 = teachers[0]
+                  const t2 = teachers[1]
+                  const thumb1 = t1?.photo_url || c.image_url
+                  const thumb2 = t2?.photo_url
                   return (
                     <div key={s.id} className="month-dot"
                       style={{ background: c.calendar_color }}
-                      onClick={() => openCourse(s)} title={c.name}>
+                      onClick={() => openCourse(s)} title={`${c.name} · ${s.start_time} · ${s.room || c.room || ''}`}>
                       <div className="month-dot-inner">
-                        {thumb
-                          ? <img src={thumb} alt="" className="month-dot-thumb month-dot-thumb--round"
-                              onError={(e) => { e.target.style.display = 'none' }} />
-                          : <span style={{ width: 14 }} />
-                        }
-                        <span>{c.name}</span>
+                        {thumb1 && (
+                          <img src={thumb1} alt="" className="month-dot-thumb month-dot-thumb--round"
+                            onError={(e) => { e.target.style.display = 'none' }} />
+                        )}
+                        {thumb2 && (
+                          <img src={thumb2} alt="" className="month-dot-thumb month-dot-thumb--round"
+                            style={{ marginLeft: '-8px' }}
+                            onError={(e) => { e.target.style.display = 'none' }} />
+                        )}
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                          {(s.room || c.room) && (
+                            <div style={{ fontSize: '0.56rem', opacity: 0.72 }}>{s.room || c.room}</div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )

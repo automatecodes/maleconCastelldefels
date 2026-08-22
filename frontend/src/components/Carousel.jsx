@@ -15,6 +15,7 @@ export default function Carousel({ images = [], onImageClick, interval = 4000 })
       <div className="carousel-frame">
         {images.map((src, idx) => (
           <img key={idx} src={src} alt={`Instalación ${idx + 1}`}
+            loading={idx === 0 ? 'eager' : 'lazy'}
             className={idx === i ? 'carousel-img active' : 'carousel-img'}
             onClick={() => onImageClick && onImageClick(src)}
             onError={(e) => { e.target.style.opacity = 0.15 }} />

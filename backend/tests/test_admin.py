@@ -115,7 +115,7 @@ class TestAdminStudents:
     def test_list_students_empty(self, client, auth_headers):
         resp = client.get("/api/admin/students", headers=auth_headers)
         assert resp.status_code == 200
-        assert resp.json() == []
+        assert resp.json()["items"] == []
 
     def test_create_student(self, client, auth_headers):
         payload = {
@@ -136,12 +136,12 @@ class TestAdminStudents:
         resp = client.get(
             "/api/admin/students?status=interesado", headers=auth_headers
         )
-        assert len(resp.json()) == 1
+        assert len(resp.json()["items"]) == 1
 
         resp2 = client.get(
             "/api/admin/students?status=baja", headers=auth_headers
         )
-        assert resp2.json() == []
+        assert resp2.json()["items"] == []
 
     def test_student_status_valid_values(self, client, auth_headers):
         for status in ("inscrito", "interesado", "graduado", "baja"):
@@ -237,7 +237,7 @@ class TestAdminLeads:
         })
         resp = client.get("/api/admin/leads", headers=auth_headers)
         assert resp.status_code == 200
-        assert len(resp.json()) == 1
+        assert len(resp.json()["items"]) == 1
 
     def test_convert_lead_to_student(self, client, auth_headers):
         # Crear lead

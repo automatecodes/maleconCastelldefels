@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getMe } from '../../api/client'
+import { getMe, logoutApi } from '../../api/client'
 
 export default function AdminLayout({ adminBase = '/gurutiadmin' }) {
   const { t } = useTranslation()
@@ -9,14 +9,10 @@ export default function AdminLayout({ adminBase = '/gurutiadmin' }) {
   const [ok, setOk] = useState(false)
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) { nav(adminBase); return }
-    getMe().then(() => setOk(true)).catch(() => {
-      localStorage.removeItem('token')
-      nav(adminBase)
-    })
+    getMe().then(() => setOk(true)).catch(() => nav(adminBase))
   }, [nav, adminBase])
 
-  const logout = () => { localStorage.removeItem('token'); nav(adminBase) }
+  const logout = () => { logoutApi().finally(() => nav(adminBase)) }
 
   if (!ok) return <div className="admin-login">{t('common.loading')}</div>
 

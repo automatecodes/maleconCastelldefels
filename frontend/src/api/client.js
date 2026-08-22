@@ -1,14 +1,8 @@
 import axios from 'axios'
 
 // El backend se sirve bajo /api (proxy en dev, mismo dominio en prod).
-const api = axios.create({ baseURL: '/api' })
-
-// Inyecta el token JWT del admin si existe.
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+// withCredentials: true → el navegador envía la cookie HttpOnly automáticamente.
+const api = axios.create({ baseURL: '/api', withCredentials: true })
 
 // Endpoints públicos
 export const getConfig = () => api.get('/public/config').then((r) => r.data)
@@ -27,12 +21,26 @@ export const login = (email, password) => {
   form.append('password', password)
   return api.post('/auth/login', form).then((r) => r.data)
 }
+export const logoutApi = () => api.post('/auth/logout').then((r) => r.data)
 export const getMe = () => api.get('/auth/me').then((r) => r.data)
 export const adminGet = (path) => api.get(`/admin/${path}`).then((r) => r.data)
 export const adminPost = (path, body) => api.post(`/admin/${path}`, body).then((r) => r.data)
 export const adminPut = (path, body) => api.put(`/admin/${path}`, body).then((r) => r.data)
 export const adminPatch = (path, body) => api.patch(`/admin/${path}`, body).then((r) => r.data)
 export const adminDelete = (path) => api.delete(`/admin/${path}`).then((r) => r.data)
+
+// Extracts the human-readable detail from a non-ok fetch Response.
+export async function apiError(res) {
+  try {
+    const body = await res.json()
+    if (Array.isArray(body.detail)) {
+      return body.detail.map((e) => e.msg || JSON.stringify(e)).join(' · ')
+    }
+    return body.detail ?? `Error ${res.status}`
+  } catch {
+    return `Error ${res.status}`
+  }
+}
 
 // Apariencia / tema (hoja de estilos activa)
 export const getActiveTheme = () => api.get('/public/theme').then((r) => r.data)

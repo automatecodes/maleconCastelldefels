@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { login } from '../../api/client'
+import { login, getMe } from '../../api/client'
 
 export default function AdminLogin({ adminBase = '/gurutiadmin' }) {
   const { t } = useTranslation()
@@ -11,15 +11,15 @@ export default function AdminLogin({ adminBase = '/gurutiadmin' }) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (localStorage.getItem('token')) nav(`${adminBase}/dashboard`)
+    // Si ya hay sesión activa (cookie válida), redirigir al dashboard
+    getMe().then(() => nav(`${adminBase}/dashboard`)).catch(() => {})
   }, [nav, adminBase])
 
   const onSubmit = async (e) => {
     e.preventDefault()
     setError(false)
     try {
-      const { access_token } = await login(email, password)
-      localStorage.setItem('token', access_token)
+      await login(email, password) // el servidor establece la cookie HttpOnly
       nav(`${adminBase}/dashboard`)
     } catch {
       setError(true)

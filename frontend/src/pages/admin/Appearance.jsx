@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { adminGetThemes, adminSetTheme, adminGetVideoSettings, adminSetVideoSettings } from '../../api/client'
 
-const TOKEN = () => localStorage.getItem('token')
-const AUTH = () => ({ Authorization: `Bearer ${TOKEN()}` })
 
 /** Refresca el <link> del tema activo para previsualizar el cambio al instante. */
 function reloadActiveTheme() {
@@ -36,6 +34,11 @@ export default function Appearance() {
   // Import
   const importRef = useRef(null)
   const [importMsg, setImportMsg] = useState('')
+
+  // Preset theme import via dropdown
+  const [presetImport, setPresetImport] = useState('')
+  const [presetImportMsg, setPresetImportMsg] = useState('')
+  const [presetImporting, setPresetImporting] = useState(false)
 
   // URL → tema
   const [urlInput, setUrlInput] = useState('')
@@ -72,7 +75,7 @@ export default function Appearance() {
     setThemeEditLoading(true)
     setThemeEditMsg('')
     try {
-      const res = await fetch(`/api/admin/themes/config/${themeName}`, { headers: AUTH() })
+      const res = await fetch(`/api/admin/themes/config/${themeName}`, { credentials: 'include' })
       if (!res.ok) throw new Error()
       const data = await res.json()
       setThemeEditData(data)
@@ -93,7 +96,8 @@ export default function Appearance() {
     try {
       const res = await fetch(`/api/admin/themes/config/${themeEditName}`, {
         method: 'PUT',
-        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: themeEditName,
           ...themeEditData,
@@ -120,7 +124,8 @@ export default function Appearance() {
     try {
       const res = await fetch('/api/admin/themes/from-url', {
         method: 'POST',
-        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: urlInput.trim(), name: urlName.trim() || 'tema-generado', apply: urlApply }),
       })
       const data = await res.json()
@@ -133,6 +138,28 @@ export default function Appearance() {
       setUrlMsg(`❌ ${e.message}`)
     } finally {
       setUrlGenerating(false)
+    }
+  }
+
+  const applyPresetTheme = async () => {
+    if (!presetImport) return
+    setPresetImporting(true)
+    setPresetImportMsg('')
+    try {
+      const res = await fetch('/api/admin/themes', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: presetImport }),
+      })
+      if (!res.ok) throw new Error()
+      setActive(presetImport)
+      reloadActiveTheme()
+      setPresetImportMsg(`✅ Tema "${presetImport}" aplicado`)
+    } catch {
+      setPresetImportMsg('❌ Error al aplicar el tema')
+    } finally {
+      setPresetImporting(false)
     }
   }
 
@@ -155,7 +182,7 @@ export default function Appearance() {
 
   useEffect(() => {
     setVarsLoading(true)
-    fetch('/api/admin/themes/variables', { headers: AUTH() })
+    fetch('/api/admin/themes/variables', { credentials: 'include' })
       .then((r) => r.json())
       .then((d) => setVars(d.vars || {}))
       .catch(() => setVarsMsg('Error cargando variables'))
@@ -182,7 +209,8 @@ export default function Appearance() {
     try {
       const res = await fetch('/api/admin/themes/variables', {
         method: 'PUT',
-        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vars }),
       })
       if (!res.ok) throw new Error()
@@ -197,7 +225,7 @@ export default function Appearance() {
 
   const exportTheme = async () => {
     try {
-      const res = await fetch('/api/admin/themes/export', { headers: AUTH() })
+      const res = await fetch('/api/admin/themes/export', { credentials: 'include' })
       if (!res.ok) throw new Error()
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
@@ -221,7 +249,8 @@ export default function Appearance() {
       if (!data.vars) throw new Error('Formato inválido: falta "vars"')
       const res = await fetch('/api/admin/themes/import', {
         method: 'POST',
-        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vars: data.vars }),
       })
       if (!res.ok) throw new Error()
@@ -319,14 +348,58 @@ export default function Appearance() {
       </div>
 
       {/* Export / Import */}
-      <div className="card card-body" style={{ maxWidth: 560 }}>
+      <div className="card card-body" style={{ maxWidth: 620, marginBottom: '1.5rem' }}>
         <h3 style={{ marginBottom: '1rem' }}>Exportar / Importar tema</h3>
+
+        {/* Preset theme dropdown */}
+        <div style={{ marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: '1px solid var(--border)' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+            Aplicar tema preset
+          </label>
+          <p className="tag-dim" style={{ fontSize: '0.82rem', marginBottom: '0.75rem' }}>
+            Selecciona uno de los temas disponibles en el servidor para aplicarlo directamente.
+          </p>
+          <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <select
+              value={presetImport}
+              onChange={(e) => { setPresetImport(e.target.value); setPresetImportMsg('') }}
+              style={{ flex: '1 1 220px', minWidth: 180 }}
+            >
+              <option value="">— Elige un tema —</option>
+              {themes.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+            <button
+              className="btn btn-primary"
+              onClick={applyPresetTheme}
+              disabled={presetImporting || !presetImport}
+              style={{ flexShrink: 0 }}
+            >
+              {presetImporting ? 'Aplicando…' : '✦ Aplicar tema'}
+            </button>
+          </div>
+          {presetImportMsg && (
+            <p style={{
+              marginTop: '0.6rem',
+              fontSize: '0.85rem',
+              color: presetImportMsg.startsWith('✅') ? 'var(--green)' : '#ef4444',
+            }}>
+              {presetImportMsg}
+            </p>
+          )}
+        </div>
+
+        {/* JSON export / import */}
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+          Exportar / importar variables (JSON)
+        </label>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button className="btn btn-ghost" onClick={exportTheme}>
-            Exportar tema (JSON)
+            ↓ Exportar JSON
           </button>
           <label className="btn btn-ghost" style={{ cursor: 'pointer' }}>
-            Importar tema (JSON)
+            ↑ Importar JSON
             <input
               ref={importRef}
               type="file"

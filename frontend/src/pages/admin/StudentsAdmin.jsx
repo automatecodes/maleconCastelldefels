@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import Modal from '../../components/Modal'
+import { apiError } from '../../api/client'
 
 const API = '/api/admin'
-const token = () => localStorage.getItem('token')
-const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` })
+const authHeaders = () => ({ 'Content-Type': 'application/json' })
 
 const STATUS_COLORS = {
   inscrito: '#16a34a',
@@ -50,8 +50,12 @@ const EMPTY_FORM = {
   guardian_contact: '',
 }
 
+const PAGE_SIZE = 20
+
 export default function StudentsAdmin() {
   const [students, setStudents] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -68,23 +72,26 @@ export default function StudentsAdmin() {
   const [addingCourse, setAddingCourse] = useState(null) // studentId being enrolled
   const [selectedCourseId, setSelectedCourseId] = useState('')
 
-  const loadStudents = useCallback(async () => {
+  const loadStudents = useCallback(async (p = page) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API}/students`, { headers: authHeaders() })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
-      setStudents(await res.json())
+      const skip = p * PAGE_SIZE
+      const res = await fetch(`${API}/students?skip=${skip}&limit=${PAGE_SIZE}`, { headers: authHeaders(), credentials: 'include' })
+      if (!res.ok) throw new Error(await apiError(res))
+      const data = await res.json()
+      setStudents(data.items)
+      setTotal(data.total)
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [page])
 
   const loadCourses = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/courses`, { headers: authHeaders() })
+      const res = await fetch(`${API}/courses`, { headers: authHeaders(), credentials: 'include' })
       if (res.ok) setCourses(await res.json())
     } catch {}
   }, [])
@@ -96,7 +103,7 @@ export default function StudentsAdmin() {
 
   const loadEnrollments = async (studentId) => {
     try {
-      const res = await fetch(`${API}/students/${studentId}`, { headers: authHeaders() })
+      const res = await fetch(`${API}/students/${studentId}`, { headers: authHeaders(), credentials: 'include' })
       if (!res.ok) return
       const data = await res.json()
       setEnrollments((prev) => ({ ...prev, [studentId]: data.enrollments ?? [] }))
@@ -119,7 +126,7 @@ export default function StudentsAdmin() {
         method: 'DELETE',
         headers: authHeaders(),
       })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      if (!res.ok) throw new Error(await apiError(res))
       await loadEnrollments(studentId)
       loadStudents()
     } catch (e) {
@@ -219,7 +226,7 @@ export default function StudentsAdmin() {
         method: 'DELETE',
         headers: authHeaders(),
       })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      if (!res.ok) throw new Error(await apiError(res))
       loadStudents()
     } catch (e) {
       alert(`Error al eliminar: ${e.message}`)
@@ -338,6 +345,17 @@ export default function StudentsAdmin() {
             </tbody>
           </table>
           {students.length === 0 && <p className="tag-dim" style={{ padding: '1rem' }}>Sin registros.</p>}
+          {total > PAGE_SIZE && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem 0.5rem', justifyContent: 'flex-end' }}>
+              <span className="tag-dim" style={{ fontSize: '0.85rem' }}>
+                {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, total)} de {total}
+              </span>
+              <button className="btn btn-ghost" disabled={page === 0}
+                onClick={() => { setPage(p => p - 1); loadStudents(page - 1) }}>← Anterior</button>
+              <button className="btn btn-ghost" disabled={(page + 1) * PAGE_SIZE >= total}
+                onClick={() => { setPage(p => p + 1); loadStudents(page + 1) }}>Siguiente →</button>
+            </div>
+          )}
         </div>
       )}
 

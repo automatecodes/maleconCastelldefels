@@ -1,23 +1,37 @@
-import { useEffect, useState } from 'react'
-import { adminGet, adminPatch, adminPost } from '../../api/client'
+import { useEffect, useState, useCallback } from 'react'
+import { adminPatch, adminPost } from '../../api/client'
 
 const STATES = ['nuevo', 'contactado', 'convertido', 'descartado']
+const PAGE_SIZE = 20
 
 export default function LeadsAdmin() {
   const [leads, setLeads] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [filter, setFilter] = useState('')
 
-  const load = () => adminGet('leads' + (filter ? `?status=${filter}` : '')).then(setLeads).catch(() => {})
-  useEffect(() => { load() }, [filter])
+  const load = useCallback(async (p = page) => {
+    const skip = p * PAGE_SIZE
+    const params = new URLSearchParams({ skip, limit: PAGE_SIZE })
+    if (filter) params.set('status', filter)
+    const res = await fetch(`/api/admin/leads?${params}`, { credentials: 'include' })
+    if (!res.ok) return
+    const data = await res.json()
+    setLeads(data.items)
+    setTotal(data.total)
+  }, [filter, page])
+
+  useEffect(() => { setPage(0); load(0) }, [filter])
+  useEffect(() => { load(page) }, [page])
 
   const setStatus = async (lead, status) => {
     await adminPatch(`leads/${lead.id}`, { status })
-    load()
+    load(page)
   }
   const convert = async (lead) => {
     if (!confirm(`¿Convertir "${lead.name}" en estudiante?`)) return
     await adminPost(`leads/${lead.id}/convert`, {})
-    load()
+    load(page)
   }
 
   return (
@@ -62,6 +76,17 @@ export default function LeadsAdmin() {
           </tbody>
         </table>
         {leads.length === 0 && <p className="tag-dim" style={{ padding: '1rem' }}>Sin leads.</p>}
+        {total > PAGE_SIZE && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem 0.5rem', justifyContent: 'flex-end' }}>
+            <span className="tag-dim" style={{ fontSize: '0.85rem' }}>
+              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, total)} de {total}
+            </span>
+            <button className="btn btn-ghost" disabled={page === 0}
+              onClick={() => setPage(p => p - 1)}>← Anterior</button>
+            <button className="btn btn-ghost" disabled={(page + 1) * PAGE_SIZE >= total}
+              onClick={() => setPage(p => p + 1)}>Siguiente →</button>
+          </div>
+        )}
       </div>
     </div>
   )

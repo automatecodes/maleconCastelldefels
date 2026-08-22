@@ -10,8 +10,6 @@
  */
 import { useEffect, useRef, useState } from 'react'
 
-const TOKEN = () => localStorage.getItem('token')
-const AUTH  = () => ({ Authorization: `Bearer ${TOKEN()}` })
 
 function isImage(name = '') { return /\.(jpe?g|png|gif|webp|svg|avif)$/i.test(name) }
 function isVideo(name = '') { return /\.(mp4|webm|mov)$/i.test(name) }
@@ -45,7 +43,7 @@ function MediaBrowser({ accept, onSelect, onClose }) {
   const load = (path) => {
     setLoading(true)
     setUploadMsg('')
-    fetch(`/api/admin/media/list?folder=${encodeURIComponent(path)}`, { headers: AUTH() })
+    fetch(`/api/admin/media/list?folder=${encodeURIComponent(path)}`, { credentials: 'include' })
       .then((r) => r.json())
       .then((d) => setItems(d.items || []))
       .catch(() => {})
@@ -67,7 +65,7 @@ function MediaBrowser({ accept, onSelect, onClose }) {
       form.append('folder', folder)
       form.append('file', file)
       const res = await fetch('/api/admin/media/upload', {
-        method: 'POST', headers: AUTH(), body: form,
+        method: 'POST', credentials: 'include', body: form,
       })
       if (!res.ok) throw new Error()
       const data = await res.json()

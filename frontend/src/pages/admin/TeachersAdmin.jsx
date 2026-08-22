@@ -3,10 +3,10 @@ import Modal from '../../components/Modal'
 import MediaPicker from './MediaPicker'
 import FocalPointPicker from './FocalPointPicker'
 import MultiMediaPicker from './MultiMediaPicker'
+import { apiError } from '../../api/client'
 
 const API = '/api/admin'
-const token = () => localStorage.getItem('token')
-const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` })
+const authHeaders = () => ({ 'Content-Type': 'application/json' })
 
 const EMPTY_FORM = {
   slug: '',
@@ -48,8 +48,8 @@ export default function TeachersAdmin() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API}/teachers`, { headers: authHeaders() })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      const res = await fetch(`${API}/teachers`, { headers: authHeaders(), credentials: 'include' })
+      if (!res.ok) throw new Error(await apiError(res))
       setTeachers(await res.json())
     } catch (e) {
       setError(e.message)
@@ -60,7 +60,7 @@ export default function TeachersAdmin() {
 
   const loadCourses = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/courses`, { headers: authHeaders() })
+      const res = await fetch(`${API}/courses`, { headers: authHeaders(), credentials: 'include' })
       if (res.ok) setCourses(await res.json())
     } catch {}
   }, [])

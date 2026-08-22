@@ -3,11 +3,10 @@ import Modal from '../../components/Modal'
 import AiImageButton from './AiImageButton'
 import MediaPicker from './MediaPicker'
 import MultiMediaPicker from './MultiMediaPicker'
-import { generateCourseImage } from '../../api/client'
+import { generateCourseImage, apiError } from '../../api/client'
 
 const API = '/api/admin'
-const token = () => localStorage.getItem('token')
-const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` })
+const authHeaders = () => ({ 'Content-Type': 'application/json' })
 
 // Paleta pastel para calendarios (20 colores, texto oscuro sobre fondo pastel)
 const COURSE_PALETTE = [
@@ -78,8 +77,8 @@ export default function CoursesAdmin() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API}/courses`, { headers: authHeaders() })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      const res = await fetch(`${API}/courses`, { headers: authHeaders(), credentials: 'include' })
+      if (!res.ok) throw new Error(await apiError(res))
       setCourses(await res.json())
     } catch (e) {
       setError(e.message)
@@ -90,7 +89,7 @@ export default function CoursesAdmin() {
 
   const loadTeachers = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/teachers`, { headers: authHeaders() })
+      const res = await fetch(`${API}/teachers`, { headers: authHeaders(), credentials: 'include' })
       if (res.ok) setTeachers(await res.json())
     } catch {}
   }, [])
@@ -193,7 +192,7 @@ export default function CoursesAdmin() {
         method: 'DELETE',
         headers: authHeaders(),
       })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      if (!res.ok) throw new Error(await apiError(res))
       loadCourses()
     } catch (e) {
       alert(`Error al eliminar: ${e.message}`)
@@ -205,7 +204,7 @@ export default function CoursesAdmin() {
     setEnrolledStudents([])
     setStudentsLoading(true)
     try {
-      const res = await fetch(`${API}/courses/${course.id}/students`, { headers: authHeaders() })
+      const res = await fetch(`${API}/courses/${course.id}/students`, { headers: authHeaders(), credentials: 'include' })
       if (res.ok) setEnrolledStudents(await res.json())
     } catch {}
     setStudentsLoading(false)
@@ -218,7 +217,7 @@ export default function CoursesAdmin() {
         method: 'DELETE',
         headers: authHeaders(),
       })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
+      if (!res.ok) throw new Error(await apiError(res))
       setEnrolledStudents((prev) => prev.filter((s) => s.id !== studentId))
       loadCourses()
     } catch (e) {

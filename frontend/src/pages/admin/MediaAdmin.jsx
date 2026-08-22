@@ -1,7 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
 
-const TOKEN = () => localStorage.getItem('token')
-const AUTH = () => ({ Authorization: `Bearer ${TOKEN()}` })
 
 function FolderIcon() {
   return (
@@ -40,7 +38,7 @@ function MetadataModal({ item, folder, onClose }) {
   const [msg, setMsg] = useState('')
 
   useEffect(() => {
-    fetch(`/api/admin/media/metadata?path=${encodeURIComponent(path)}`, { headers: AUTH() })
+    fetch(`/api/admin/media/metadata?path=${encodeURIComponent(path)}`, { credentials: 'include' })
       .then((r) => r.json())
       .then((d) => setMeta({ alt_text: d.alt_text || '', link_url: d.link_url || '', title: d.title || '', seo_description: d.seo_description || '' }))
       .catch(() => setMsg('Error cargando metadatos'))
@@ -53,7 +51,8 @@ function MetadataModal({ item, folder, onClose }) {
     try {
       const res = await fetch('/api/admin/media/metadata', {
         method: 'PUT',
-        headers: { ...AUTH(), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path, ...meta }),
       })
       if (!res.ok) throw new Error()
@@ -120,7 +119,7 @@ export default function MediaAdmin() {
   const load = (path) => {
     setLoading(true)
     setUploadMsg('')
-    fetch(`/api/admin/media/list?folder=${encodeURIComponent(path)}`, { headers: AUTH() })
+    fetch(`/api/admin/media/list?folder=${encodeURIComponent(path)}`, { credentials: 'include' })
       .then((r) => r.json())
       .then((d) => setItems(d.items || []))
       .catch(() => setUploadMsg('Error cargando archivos'))
@@ -146,7 +145,7 @@ export default function MediaAdmin() {
       form.append('file', file)
       const res = await fetch('/api/admin/media/upload', {
         method: 'POST',
-        headers: AUTH(),
+        credentials: 'include',
         body: form,
       })
       if (!res.ok) throw new Error()
@@ -166,7 +165,7 @@ export default function MediaAdmin() {
     try {
       const res = await fetch(`/api/admin/media/delete?path=${encodeURIComponent(path)}`, {
         method: 'DELETE',
-        headers: AUTH(),
+        credentials: 'include',
       })
       if (!res.ok) throw new Error()
       load(folder)
@@ -267,6 +266,7 @@ export default function MediaAdmin() {
                   <img
                     src={mediaUrl(item)}
                     alt={item.name}
+                    loading="lazy"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={(e) => { e.target.style.display = 'none' }}
                   />

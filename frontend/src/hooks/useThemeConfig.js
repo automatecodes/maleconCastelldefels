@@ -28,11 +28,41 @@ export function useThemeConfig() {
           logoImg.style.filter = filter
         }
 
-        // Si hay scripts personalizados, inyectarlos
+        // Scripts personalizados — sandbox que bloquea acceso a storage, red y cookies
         if (config.scripts && config.scripts.trim()) {
           try {
-            // eslint-disable-next-line no-eval
-            eval(config.scripts)
+            const safeDocument = {
+              getElementById:     document.getElementById.bind(document),
+              querySelector:      document.querySelector.bind(document),
+              querySelectorAll:   document.querySelectorAll.bind(document),
+              createElement:      document.createElement.bind(document),
+              body:               document.body,
+              head:               document.head,
+            }
+            const safeWindow = {
+              innerWidth:              window.innerWidth,
+              innerHeight:             window.innerHeight,
+              devicePixelRatio:        window.devicePixelRatio,
+              requestAnimationFrame:   window.requestAnimationFrame.bind(window),
+              cancelAnimationFrame:    window.cancelAnimationFrame.bind(window),
+              setTimeout:              window.setTimeout.bind(window),
+              clearTimeout:            window.clearTimeout.bind(window),
+              setInterval:             window.setInterval.bind(window),
+              clearInterval:           window.clearInterval.bind(window),
+              console:                 window.console,
+            }
+            // Los parámetros nombrados enmascaran los globals peligrosos (reciben null)
+            const sandboxed = new Function(
+              'document', 'window',
+              'localStorage', 'sessionStorage',
+              'fetch', 'XMLHttpRequest', 'WebSocket', 'navigator', 'location',
+              '"use strict";\n' + config.scripts
+            )
+            sandboxed(
+              safeDocument, safeWindow,
+              null, null,
+              null, null, null, null, null
+            )
           } catch (err) {
             console.warn('Error ejecutando scripts del tema:', err)
           }
@@ -45,11 +75,12 @@ export function useThemeConfig() {
       }
     }
 
-    // Cargar config al montar y cada vez que cambia el tema
     fetchAndApplyThemeConfig()
 
-    // Recargar config cada 5 segundos (por si el admin cambia el tema activo)
-    const interval = setInterval(fetchAndApplyThemeConfig, 5000)
+    // Polling agresivo solo en el panel admin (previsualización en vivo).
+    // En páginas públicas, 10 minutos es más que suficiente.
+    const isAdmin = window.location.pathname.startsWith('/gurutiadmin')
+    const interval = setInterval(fetchAndApplyThemeConfig, isAdmin ? 5_000 : 600_000)
 
     return () => clearInterval(interval)
   }, [])

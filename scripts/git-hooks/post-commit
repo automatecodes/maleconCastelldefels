@@ -1,0 +1,19 @@
+#!/bin/sh
+# Reconstruye el entorno Docker de legacy-elmalecon-react tras cada commit.
+# Este fichero es la copia canónica versionada; .git/hooks/post-commit es
+# un symlink relativo a ../../scripts/git-hooks/post-commit. Ejecuta
+# ./scripts/git-hooks/install.sh tras clonar para reinstalar el symlink.
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "▶ docker compose stop..."
+docker compose stop
+echo "▶ docker system prune -f..."
+docker system prune -f
+echo "▶ docker network create proxyNet (si no existe)..."
+docker network create proxyNet 2>/dev/null || true
+echo "▶ docker compose up --build -d..."
+docker compose -f docker-compose.yml -f dev.yml up --build -d
+echo "✓ Entorno reconstruido."

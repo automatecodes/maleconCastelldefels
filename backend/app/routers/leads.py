@@ -1,7 +1,7 @@
 """Bandeja de Leads (admin): gestión y conversión a estudiante."""
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -14,12 +14,19 @@ router = APIRouter(prefix="/api/admin/leads", tags=["admin:leads"],
                    dependencies=[Depends(require_admin)])
 
 
-@router.get("", response_model=list[LeadOut])
-def list_leads(db: Session = Depends(get_db), status: str | None = None):
+@router.get("")
+def list_leads(
+    db: Session = Depends(get_db),
+    status: str | None = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=200),
+):
     q = db.query(Lead)
     if status:
         q = q.filter(Lead.status == status)
-    return q.order_by(Lead.created_at.desc()).all()
+    q = q.order_by(Lead.created_at.desc())
+    total = q.count()
+    return {"total": total, "skip": skip, "limit": limit, "items": q.offset(skip).limit(limit).all()}
 
 
 @router.patch("/{lead_id}", response_model=LeadOut)

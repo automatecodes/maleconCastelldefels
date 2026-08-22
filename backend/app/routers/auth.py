@@ -3,10 +3,11 @@ import threading
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, verify_password
@@ -15,7 +16,12 @@ from app.schemas.auth import Token, UserOut
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+_COOKIE_MAX_AGE = 60 * 60 * 24  # 24 horas en segundos
+
 # ── Rate limiter in-memory (thread-safe) ─────────────────────────────────────
+# Válido para despliegue de un único contenedor. Si se escala a múltiples
+# réplicas, migrar a Redis (pip install redis + RedisRateLimiter) para que el
+# contador sea compartido entre procesos y persista entre reinicios.
 _attempts: dict[str, list[datetime]] = defaultdict(list)
 _lock = threading.Lock()
 
@@ -48,6 +54,7 @@ def _rate_limit(ip: str) -> None:
 
 @router.post("/login", response_model=Token)
 def login(
+    response: Response,
     request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -62,7 +69,26 @@ def login(
         raise HTTPException(status_code=403, detail="Usuario desactivado")
 
     token = create_access_token(subject=user.email, role=user.role)
+
+    # Cookie HttpOnly: el navegador la envía automáticamente, JS nunca puede leerla
+    response.set_cookie(
+        key="token",
+        value=token,
+        httponly=True,
+        samesite="strict",
+        secure=(settings.ENV != "development"),
+        max_age=_COOKIE_MAX_AGE,
+        path="/",
+    )
+    # También se devuelve en el body para compatibilidad con Swagger / tests
     return Token(access_token=token)
+
+
+@router.post("/logout")
+def logout(response: Response):
+    """Elimina la cookie de sesión."""
+    response.delete_cookie(key="token", path="/", samesite="strict")
+    return {"ok": True}
 
 
 @router.get("/me", response_model=UserOut)

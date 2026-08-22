@@ -1,7 +1,7 @@
 """CRUD de estudiantes (admin) con enrollments anidados y consistencia de estado."""
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.database import get_db
@@ -29,14 +29,22 @@ def _build_out(student: Student) -> StudentOut:
     return data
 
 
-@router.get("", response_model=list[StudentOut])
-def list_students(db: Session = Depends(get_db), status: str | None = None):
+@router.get("")
+def list_students(
+    db: Session = Depends(get_db),
+    status: str | None = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=200),
+):
     q = db.query(Student).options(
         joinedload(Student.enrollments).joinedload(Enrollment.course)
     )
     if status:
         q = q.filter(Student.status == status)
-    return [_build_out(s) for s in q.order_by(Student.created_at.desc()).all()]
+    q = q.order_by(Student.created_at.desc())
+    total = q.count()
+    items = [_build_out(s) for s in q.offset(skip).limit(limit).all()]
+    return {"total": total, "skip": skip, "limit": limit, "items": items}
 
 
 @router.post("", response_model=StudentOut, status_code=201)

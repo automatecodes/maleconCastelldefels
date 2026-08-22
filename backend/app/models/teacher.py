@@ -1,5 +1,5 @@
 """Profesor."""
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, func
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, func, JSON
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -17,7 +17,7 @@ class Teacher(Base):
     specialties = Column(String, nullable=True)  # CSV: "Salsa, Bachata"
     photo_url    = Column(String, nullable=True)
     photo_focal  = Column(String, nullable=True, default="50% 50%")
-    extra_images = Column(Text, nullable=True)   # JSON array de URLs
+    extra_images = Column(JSON, nullable=True)
     is_published = Column(Boolean, default=True, nullable=False)
     cv_pdf_url   = Column(String, nullable=True)
     video_url = Column(String, nullable=True)

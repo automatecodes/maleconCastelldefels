@@ -1,6 +1,6 @@
 """Curso y tabla de asociación curso-profesor."""
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, DateTime, Numeric, Table, ForeignKey, func
+    Column, Integer, String, Text, Boolean, DateTime, Numeric, Table, ForeignKey, func, JSON
 )
 from sqlalchemy.orm import relationship
 
@@ -25,7 +25,7 @@ class Course(Base):
     description = Column(Text, nullable=True)
     image_url = Column(String, nullable=True)
     video_url    = Column(String, nullable=True)
-    extra_images = Column(Text, nullable=True)   # JSON array de URLs
+    extra_images = Column(JSON, nullable=True)
     is_published = Column(Boolean, default=True, nullable=False)
     calendar_color = Column(String, default="#52C41A", nullable=False)
     room = Column(String, nullable=True)

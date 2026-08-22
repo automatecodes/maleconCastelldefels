@@ -38,11 +38,69 @@ def run():
             "ALTER TABLE events   ADD COLUMN IF NOT EXISTS is_published  BOOLEAN DEFAULT TRUE NOT NULL",
             "ALTER TABLE courses  ADD COLUMN IF NOT EXISTS extra_images  TEXT",
             "ALTER TABLE courses  ADD COLUMN IF NOT EXISTS is_published  BOOLEAN DEFAULT TRUE NOT NULL",
+            # CHECK constraints para estados — idempotentes vía DO $$
+            """
+            DO $$ BEGIN
+              IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_students_status') THEN
+                ALTER TABLE students ADD CONSTRAINT chk_students_status
+                  CHECK (status IN ('inscrito','interesado','graduado','baja'));
+              END IF;
+            END $$
+            """,
+            """
+            DO $$ BEGIN
+              IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_enrollments_status') THEN
+                ALTER TABLE enrollments ADD CONSTRAINT chk_enrollments_status
+                  CHECK (status IN ('activo','prueba','baja','lista de espera'));
+              END IF;
+            END $$
+            """,
+            """
+            DO $$ BEGIN
+              IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_leads_status') THEN
+                ALTER TABLE leads ADD CONSTRAINT chk_leads_status
+                  CHECK (status IN ('nuevo','contactado','convertido','descartado'));
+              END IF;
+            END $$
+            """,
+            # Migrar extra_images de TEXT → JSONB (idempotente: solo si aún es TEXT)
+            """
+            DO $$ BEGIN
+              IF (SELECT data_type FROM information_schema.columns
+                  WHERE table_name='teachers' AND column_name='extra_images') = 'text' THEN
+                ALTER TABLE teachers ALTER COLUMN extra_images TYPE JSONB
+                  USING NULLIF(extra_images,'')::jsonb;
+              END IF;
+            END $$
+            """,
+            """
+            DO $$ BEGIN
+              IF (SELECT data_type FROM information_schema.columns
+                  WHERE table_name='courses' AND column_name='extra_images') = 'text' THEN
+                ALTER TABLE courses ALTER COLUMN extra_images TYPE JSONB
+                  USING NULLIF(extra_images,'')::jsonb;
+              END IF;
+            END $$
+            """,
+            """
+            DO $$ BEGIN
+              IF (SELECT data_type FROM information_schema.columns
+                  WHERE table_name='events' AND column_name='extra_images') = 'text' THEN
+                ALTER TABLE events ALTER COLUMN extra_images TYPE JSONB
+                  USING NULLIF(extra_images,'')::jsonb;
+              END IF;
+            END $$
+            """,
         ]:
             conn.execute(text(sql))
         conn.commit()
     db = SessionLocal()
     try:
+        # One-time guard: skip if seed was already executed successfully
+        if db.query(models.SiteSetting).filter_by(key='seed_completed').first():
+            print('Seed ya ejecutado, saltando.')
+            return
+
         # ── Admin users ──────────────────────────────────────────────────────
         admin2_accounts = []
         if settings.ADMIN2_EMAIL and settings.ADMIN2_PASSWORD:
@@ -305,6 +363,7 @@ def run():
         upsert_setting(db, "ADDRESS", "Carrer de Tomàs Edison, 20, 08860 Castelldefels, Barcelona")
         upsert_setting(db, "PHONE", "672 89 52 39")
 
+        db.add(models.SiteSetting(key='seed_completed', value='1'))
         db.commit()
         print("✅  Seed completado — datos reales de elMalecón Castelldefels cargados.")
     finally:

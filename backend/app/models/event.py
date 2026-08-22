@@ -1,5 +1,5 @@
 """Evento y sus fotos de galería."""
-from sqlalchemy import Column, Integer, String, Text, Boolean, Date, DateTime, Numeric, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Text, Boolean, Date, DateTime, Numeric, ForeignKey, func, JSON
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -16,7 +16,7 @@ class Event(Base):
     image_url    = Column(String, nullable=True)
     image_focal  = Column(String, nullable=True, default="50% 50%")
     video_url    = Column(String, nullable=True)
-    extra_images = Column(Text, nullable=True)   # JSON array de URLs
+    extra_images = Column(JSON, nullable=True)
     is_published = Column(Boolean, default=True, nullable=False)
     date = Column(Date, nullable=True)
     time_range = Column(String, nullable=True)   # "11:00 – 23:00"

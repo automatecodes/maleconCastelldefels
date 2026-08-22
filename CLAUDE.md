@@ -16,6 +16,18 @@ URL real de la escuela: Carrer de Tomàs Edison, 20, 08860 Castelldefels. Tel: 6
 | `frontend`   | React 18 + Vite · i18n (ES/CA/EN)       | 5173 / 8080  |
 | Proxy (prod) | nginx + acme-companion (SSL automático) | 80/443       |
 
+## Setup post-clone (ejecutar una vez)
+
+```bash
+./scripts/git-hooks/install.sh
+```
+
+Instala los hooks versionados en `scripts/git-hooks/` como symlinks en
+`.git/hooks/`. Ahora mismo instala el `post-commit` que reconstruye el
+entorno Docker tras cada commit (ver "Flujo de trabajo obligatorio antes
+de `git push`" más abajo). Sin este paso, los commits no dispararán el
+rebuild automático.
+
 ## Arranque rápido
 
 ```bash

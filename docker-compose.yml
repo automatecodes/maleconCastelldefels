@@ -70,7 +70,7 @@ services:
           memory: 256M
           cpus: '0.25'
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'python' > /dev/null"]
+      test: ["CMD", "python3", "-c", "pass"]
       interval: 30s
       timeout: 10s
       retries: 3

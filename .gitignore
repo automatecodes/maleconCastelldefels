@@ -15,6 +15,9 @@
 # --- Base de datos local (volumen PostgreSQL) -------
 data/db/
 
+# --- Backups de base de datos (locales, no versionar) -
+data/backups/
+
 # --- Dependencias y entornos virtuales --------------
 node_modules/
 .venv/
